@@ -47,7 +47,7 @@
     #intro-overlay.open .intro-half.bottom { transform: translateY(100%); }
 
     #intro-overlay.done { display: none; }
-
+        
     /* ═══════════════════════════════
        HERO
     ═══════════════════════════════ */
@@ -55,8 +55,29 @@
       position: relative;
       width: 100vw; height: 100vh;
       overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      padding-top:80px;
     }
-    #bg-video {
+
+    #hero-name h3{
+      position: relative;
+      padding-top:80px;
+    }
+
+    /* Vidéo réduite, calée à gauche */
+    #bg-video{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:80%;
+      transform:translate(-50%,-50%);
+      object-fit:cover;
+      filter:grayscale(100%) contrast(1.05);
+      z-index:0;
+    }
+
+    #bg-video-2{
       position: absolute; inset: 0;
       width: 100%; height: 100%;
       object-fit: cover;
@@ -66,125 +87,195 @@
       transition: transform 0.6s ease;
       z-index: 0;
     }
+
+    /* Dégradé de fondu sur le bord droit de la vidéo */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 52%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
     #hero::after {
       content: '';
       position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events: none; z-index: 2;
       opacity: 0.35; mix-blend-mode: overlay;
     }
-    nav { position: absolute; inset: 0; z-index: 3; }
+
+    /* Layout hero : moitié gauche (vide / vidéo) + moitié droite (contenu) */
+    nav{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:auto;
+      z-index:999;
+      background:#000;
+    }
+
+    .hero-content{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 200px;
+      padding:0;
+    }
+
+    @keyframes heroNameIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
     .nav-btn {
-      position: absolute;
-      transform: translate(-50%, -50%);
+      position: static;
+      transform: none;
+      display: block;
       font-family: "Google Sans", sans-serif;
       font-weight: bold;
       text-shadow: 0 0 2px var(--red);
       text-decoration: none;
       color: var(--red);
       background: transparent;
-      padding: 0px 22px;
       transition: color .38s ease, background .10s ease, padding .38s cubic-bezier(.25,1,.5,1);
       opacity: 0;
       animation: fadeIn 1s forwards;
+      align-self: flex-start;
+      font-size: 0.85rem;
+      padding:40px 10px;
     }
+    .nav-btn + .nav-btn { margin-top: 2px; }
+
     .nav-btn:hover {
       color: var(--white);
       background: var(--red);
       border-color: var(--red);
       text-shadow: 0 0 2px var(--white);
-      padding: 32px 22px;
-      transform: translate(-50%, -50%) scale(1.04);
+      padding:40px 20px;
     }
-    .btn-apropos  { top: 24%; left: 50%; animation-delay: .25s; }
-    .btn-affiches { top: 50%; left: 20%; animation-delay: .40s; }
-    .btn-projets  { top: 50%; left: 80%; animation-delay: .55s; }
-    .btn-contacts { top: 76%; left: 50%; animation-delay: .70s; }
+    .btn-apropos  { animation-delay: .25s; }
+    .btn-affiches { animation-delay: .40s; }
+    .btn-projets  { animation-delay: .55s; }
+    .btn-contacts { animation-delay: .70s; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translate(-50%, -44%); }
-      to   { opacity: 1; transform: translate(-50%, -50%); }
+      from { opacity: 0; transform: translateX(10px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
 
     /* ═══════════════════════════════
        A PROPOS
     ═══════════════════════════════ */
     #a-propos {
-      position: relative;
       width: 100vw;
-      min-height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-    }
-
-    .apropos-bg {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      object-position: left center;
-      z-index: 0;
-    }
-
-    /* Moitié droite : contenu texte */
-    .apropos-content {
-      position: relative;
-      z-index: 1;
-      margin-left: 50%;
-      margin-right: 13%;
-      width: 58%;
-      padding: 50px 40px 50px 40px;
+      background: var(--dark);
       display: flex;
       flex-direction: column;
-      gap: 30px;
+      align-items: center;
+      padding: 80px 60px 60px;
     }
 
-    /* ── Bloc titre + texte ── */
-    .info-block { display: flex; flex-direction: column; gap: 0; }
+    /* ── Image flottante en haut ── */
+    .apropos-img-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
 
-    /* Titre : fond rouge, texte blanc, petites majuscules */
-    .info-block h3 {
-      display: inline-block;
+    .apropos-img {
+      width: 380px;
+      max-width: 80vw;
+      height: auto;
+      display: block;
+      opacity: 0;
+      animation: diskIn 1s 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+
+    @keyframes diskIn {
+      from { opacity: 0; transform: translateY(20px) rotate(-2deg); }
+      to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%       { transform: translateY(-14px) rotate(-1.5deg); }
+    }
+
+    /* ── Rangée de 5 titres ── */
+    .apropos-titles {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .apropos-title-item {
+      position: relative;
+    }
+
+    .apropos-title-item h3 {
       font-family: "Google Sans", sans-serif;
       font-weight: bold;
-      text-shadow: 0 0 2px var(--white);
-      font-size: 1rem;
+      font-size: 0.82rem;
       text-transform: uppercase;
-      color: var(--white);
-      background: var(--red);
-      padding: 10px 15px;
-      margin-bottom: 20px;
-      align-self: flex-start;
+      color: var(--red);
+      text-shadow: 0 0 2px var(--red);
+      padding: 14px 22px;
+      cursor: default;
+      white-space: nowrap;
+      display: inline-block;
+      outline: 2px solid transparent;
+      transition: outline-color .2s ease;
+    }
+    .apropos-title-item:hover h3 {
+      outline: 2px solid var(--red);
     }
 
-    /* Corps : rouge, Arial */
-    .info-block p,
-    .info-block ul,
+    /* Zone de texte fixe en bas de la section */
+    .apropos-text-zone {
+      width: 100%;
+      max-width: 640px;
+      margin-top: 48px;
+      display: grid;
+    }
+
+    .apropos-text-zone p {
+      grid-area: 1 / 1;
+      font-family: "Google Sans", sans-serif;
+      font-weight: bold;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: var(--white);
+      text-align: center;
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+    .apropos-text-zone p.visible {
+      opacity: 1;
+    }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .apropos-body p,
+    .apropos-body ul,
     .contacts-list,
     .formations-table {
       font-family: "Google Sans", sans-serif;
       font-weight: bold;
       font-size: 0.8rem;
-      line-height: 1.2;
+      line-height: 1.6;
       color: var(--white);
     }
-
-    .info-block ul { list-style: none; }
-
-    /* Row Formations / Projets Pro côte à côte */
-    .row-2col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px 28px;
-    }
-
-    /* Row Soft / Hard skills côte à côte */
-    .row-2col-skills {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px 28px;
-    }
+    .apropos-body ul { list-style: none; }
 
     .formations-table { display: flex; flex-direction: column; gap: 6px; }
     .formation-row { display: grid; grid-template-columns: 46px 1fr; gap: 6px; }
@@ -212,22 +303,10 @@
 
     /* ── RESPONSIVE MOBILE ── */
     @media (max-width: 700px) {
-      #a-propos { align-items: flex-start; }
-
-      .apropos-bg { object-position: center top; }
-
-      .apropos-content {
-        margin-left: 0;
-        width: 100%;
-        padding: 52vw 18px 40px;
-        /* Push content below the photo area */
-        background: rgba(10,10,10,0.82);
-      }
-
-      .row-2col,
-      .row-2col-skills {
-        grid-template-columns: 1fr;
-      }
+      #a-propos { padding: 80px 18px 60px; }
+      .apropos-titles { flex-direction: column; }
+      .apropos-title-item .apropos-body { position: static; width: 100%; border-top: none; border-left: 2px solid var(--red); }
+      .apropos-img { width: 160px; }
     }
 
     /* ═══════════════════════════════
@@ -251,10 +330,10 @@
       font-family: "Google Sans", sans-serif;
       font-weight: bold;
       font-size: 1rem;
-      letter-spacing: 2em;
       color: var(--red);
       text-transform: uppercase;
       text-shadow: 0 0 2px var(--red);
+      letter-spacing: 2em;
       padding: 40px 60px 36px;
       text-align: left;
     }
@@ -438,10 +517,10 @@
       font-family: "Google Sans", sans-serif;
       font-weight: bold;
       font-size: 1rem;
-      letter-spacing: 2em;
       color: var(--red);
       text-transform: uppercase;
       text-shadow: 0 0 2px var(--red);
+      letter-spacing: 2em;
       padding: 80px 60px 0;
       text-align: left;
     }
@@ -475,16 +554,46 @@
       align-items: center;
     }
 
+    /* Animation d'entrée : depuis le centre vers la position finale */
+    @keyframes diskSpread {
+      0%   { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.7); filter: brightness(0.4) saturate(0.3); }
+      60%  { opacity: 1; }
+      100% { opacity: 1; transform: translate(0, 0) scale(1); filter: brightness(0.85) saturate(0.9); }
+    }
+
+    /* Float idle différent pour chaque disk */
+    @keyframes diskFloat1 {
+      0%, 100% { transform: translateY(0px)    rotate(0deg); }
+      50%       { transform: translateY(-10px)  rotate(-1deg); }
+    }
+    @keyframes diskFloat2 {
+      0%, 100% { transform: translateY(0px)    rotate(0deg); }
+      50%       { transform: translateY(-13px)  rotate(1.2deg); }
+    }
+    @keyframes diskFloat3 {
+      0%, 100% { transform: translateY(0px)    rotate(0deg); }
+      50%       { transform: translateY(-8px)   rotate(-0.8deg); }
+    }
+    @keyframes diskFloat4 {
+      0%, 100% { transform: translateY(0px)    rotate(0deg); }
+      50%       { transform: translateY(-12px)  rotate(1deg); }
+    }
+
     .disk-inner {
       width: 120%;
-      transform-origin: bottom center;
-      transform: translateY(0px) scale(1);
-      transition:
-        transform  0.9s cubic-bezier(0.16, 1, 0.3, 1),
-        filter     0.9s cubic-bezier(0.16, 1, 0.3, 1);
-      filter: brightness(0.75) saturate(0.8);
+      transform-origin: center center;
+      filter: brightness(0.85) saturate(0.9);
       will-change: transform, filter;
+      transition:
+        transform 0.7s cubic-bezier(0.16,1,0.3,1),
+        filter    0.7s cubic-bezier(0.16,1,0.3,1);
     }
+
+    /* Float idle par défaut sur chaque card (activé via JS après entrée) */
+    .disk-card.floating:nth-child(1) .disk-inner { animation: diskFloat1 5.5s ease-in-out infinite; }
+    .disk-card.floating:nth-child(2) .disk-inner { animation: diskFloat2 6.2s ease-in-out infinite; }
+    .disk-card.floating:nth-child(3) .disk-inner { animation: diskFloat3 5.0s ease-in-out infinite; }
+    .disk-card.floating:nth-child(4) .disk-inner { animation: diskFloat4 6.8s ease-in-out infinite; }
 
     .disk-inner img {
       width: 100%;
@@ -492,27 +601,32 @@
       display: block;
     }
 
-    /* Hover : éjecte vers le haut comme une cassette insérée */
+    /* Hover : stop float, éjecte vers le haut, pleine luminosité */
     .disk-card:hover .disk-inner {
-      transform: translateY(-28px) scale(1.04);
-      filter: brightness(1.1) saturate(1.05);
+      animation: none;
+      transform: translateY(-32px) scale(1.06) rotate(-1deg);
+      filter: brightness(1.15) saturate(1.1);
+      transition:
+        transform 0.7s cubic-bezier(0.16,1,0.3,1),
+        filter    0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .disk-card:hover .disk-inner img {
+      filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+      transition: filter 0.7s ease;
     }
 
-    /* Label sous la disquette */
+    /* Label AU DESSUS de la disquette — toujours visible */
     .disk-label {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      opacity: 0;
-      transform: translateY(6px);
-      transition:
-        opacity  0.5s 0.1s cubic-bezier(0.16,1,0.3,1),
-        transform 0.5s 0.1s cubic-bezier(0.16,1,0.3,1);
+      margin-bottom: 16px;
+      opacity: 0.4;
+      transition: opacity 0.4s ease;
     }
     .disk-card:hover .disk-label {
       opacity: 1;
-      transform: translateY(0);
     }
 
     .disk-num {
@@ -524,37 +638,59 @@
       color: var(--white);
       background: var(--red);
       padding: 10px 15px;
-      margin-bottom: 10px;
-      margin-top: -80px;
+      margin-top: 0;
+      margin-bottom: 6px;
     }
     .disk-name {
       font-family: "Google Sans", sans-serif;
       font-weight: bold;
       font-size: 0.7rem;
-      letter-spacing: 0.15em;
       color: rgba(240,237,232,0.5);
       text-transform: uppercase;
     }
 
-    /* ── CONTACTS SECTION ── */
+    /* Entrée depuis le centre — positions de départ par card */
+    .disk-card:nth-child(1) { --dx: 130px;  --dy: 80px; }
+    .disk-card:nth-child(2) { --dx: -130px; --dy: 80px; }
+    .disk-card:nth-child(3) { --dx: 130px;  --dy: -80px; }
+    .disk-card:nth-child(4) { --dx: -130px; --dy: -80px; }
+
+    .disk-card.animate-in .disk-inner {
+      animation: diskSpread 1s cubic-bezier(0.16,1,0.3,1) both !important;
+    }
+    .disk-card:nth-child(1).animate-in .disk-inner { animation-delay: 0.05s !important; }
+    .disk-card:nth-child(2).animate-in .disk-inner { animation-delay: 0.15s !important; }
+    .disk-card:nth-child(3).animate-in .disk-inner { animation-delay: 0.10s !important; }
+    .disk-card:nth-child(4).animate-in .disk-inner { animation-delay: 0.20s !important; }
     #contacts {
       width: 100vw;
       background: var(--dark);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 40px;
-      padding: 30px 60px;
+      align-items: flex-start;
+      gap: 60px;
+      padding: 0 60px 80px;
     }
 
+    .contacts-title {
+      width: 100%;
+      font-family: "Google Sans", sans-serif;
+      font-weight: bold;
+      font-size: 1rem;
+      color: var(--red);
+      text-transform: uppercase;
+      text-shadow: 0 0 2px var(--red);
+      letter-spacing: 2em;
+      padding: 80px 0 0;
+      text-align: left;
+    }
 
     .contacts-row {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 40px 60px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      width: 100%;
     }
 
     .contact-item {
@@ -582,7 +718,6 @@
       font-family: "Google Sans", sans-serif;
       font-weight: bold;
       font-size: 0.8rem;
-      letter-spacing: 0.08em;
       color: var(--white);
     }
   </style>
@@ -597,93 +732,43 @@
 
   <!-- ══════════ HERO ══════════ -->
   <section id="hero">
+    <h3 id="hero-name">OLIVIER GIBERT</h3>
     <video id="bg-video" autoplay muted loop playsinline>
       <source src="assets/PAGE_D_ACCUEIL2.mp4" type="video/mp4">
     </video>
     <nav>
-      <a href="#a-propos" class="nav-btn btn-apropos">A PROPOS</a>
-      <a href="#affiches" class="nav-btn btn-affiches">AFFICHES</a>
-      <a href="#projets"  class="nav-btn btn-projets">PROJETS</a>
-      <a href="#contacts" class="nav-btn btn-contacts">CONTACTS</a>
+      <div class="hero-content">
+        <a href="#a-propos" class="nav-btn btn-apropos">A PROPOS</a>
+        <a href="#affiches" class="nav-btn btn-affiches">AFFICHES</a>
+        <a href="#projets"  class="nav-btn btn-projets">PROJETS</a>
+        <a href="#contacts" class="nav-btn btn-contacts">CONTACTS</a>
+      </div>
     </nav>
   </section>
 
   <!-- ══════════ A PROPOS ══════════ -->
   <section id="a-propos">
-    <img class="apropos-bg" src="assets/Plan de travail_1.jpg" alt="" />
 
-    <div class="apropos-content">
-
-      <!-- PROFIL — pleine largeur -->
-      <div class="info-block">
-        <h3>Profil</h3>
-        <p>Mon nom est Olivier Gibert. Actuellement étudiant en design graphique avec un parcours initial en cursus informatique, je développe une approche qui allie rigueur analytique et sensibilité artistique. En tant que producteur musical sous le nom de Kakumo et créateur de contenu sous prism.stdio, je conçois et partage des projets visuels et sonores qui traduisent un univers créatif multidisciplinaire. Cette pluralité est une force. Polyvalent et autonome, je suis à la recherche d'opportunités à l'intersection du design, de la technologie et de la création audiovisuelle et musicale.</p>
-      </div>
-
-      <!-- FORMATIONS + PROJETS PRO — 2 colonnes -->
-      <div class="row-2col">
-        <div class="info-block">
-          <h3>Formations</h3>
-          <div class="formations-table">
-            <div class="formation-row">
-              <span class="formation-year">2023<br>2025</span>
-              <span class="formation-info">Licence Informatique<br>1ère année<br>FSI - UT3 - Toulouse</span>
-            </div>
-            <div class="formation-row">
-              <span class="formation-year">2025<br>NOW</span>
-              <span class="formation-info">Bachelor Design Graphique<br>2ème année<br>LISAA Toulouse - Labège</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="info-block">
-          <h3>Projets Pro</h3>
-          <ul>
-            <li>Création de contenu Instagram</li>
-            <li>Marque de vêtement française</li>
-            <li>Graphiste d'un E-roman de développement personnel</li>
-            <li>Compositeur indépendant</li>
-            <li>Featuring avec d'autres artistes</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- SOFT SKILLS + HARD SKILLS — 2 colonnes -->
-      <div class="row-2col-skills">
-        <div class="info-block">
-          <h3>Soft Skills</h3>
-          <ul>
-            <li>Curieux</li>
-            <li>Créatif</li>
-            <li>Ponctuel</li>
-            <li>Rigoureux</li>
-            <li>Autonome</li>
-            <li>Travail d'équipe</li>
-            <li>Adaptabilité logicielle</li>
-            <li>Esprit critique</li>
-            <li>Veille technologique</li>
-            <li>Veille graphique</li>
-          </ul>
-        </div>
-
-        <div class="info-block">
-          <h3>Hard Skills</h3>
-          <ul>
-            <li>Premiere Pro</li>
-            <li>After Effects</li>
-            <li>Photoshop</li>
-            <li>Lightroom</li>
-            <li>In Design</li>
-            <li>Illustrator</li>
-            <li>Figma</li>
-            <li>Ableton Live</li>
-            <li>Blender</li>
-            <li>DaVinci Resolve</li>
-          </ul>
-        </div>
-      </div>
-
+    <div class="apropos-img-wrap">
+      <img class="apropos-img" src="assets/Plan_de_travail_1.png" alt="Olivier Gibert" />
     </div>
+
+    <div class="apropos-titles">
+      <div class="apropos-title-item" data-key="profil"><h3>Profil</h3></div>
+      <div class="apropos-title-item" data-key="formations"><h3>Formations</h3></div>
+      <div class="apropos-title-item" data-key="projets-pro"><h3>Projets Pro</h3></div>
+      <div class="apropos-title-item" data-key="soft-skills"><h3>Soft Skills</h3></div>
+      <div class="apropos-title-item" data-key="hard-skills"><h3>Hard Skills</h3></div>
+    </div>
+
+    <div class="apropos-text-zone">
+      <p data-key="profil">Mon nom est Olivier Gibert. Actuellement étudiant en design graphique (Bac+2) avec un parcours initial en cursus informatique, je développe une approche qui allie rigueur analytique et sensibilité artistique. En tant que producteur musical sous le nom de Kakumo et créateur de contenu sous prism.stdio, je conçois et partage des projets visuels et sonores qui traduisent un univers créatif multidisciplinaire. Cette pluralité est une force. Polyvalent et autonome, je suis à la recherche d’une alternance à l’intersection du design, de la technologie et de la création immersive, audiovisuelle et musicale.</p>
+      <p data-key="formations">2023-2025 <br> Licence informatique 1ère année <br>•<br>Faculté des Sciences et Ingénieurie<br>(FSI) Université de Toulouse,<br>Toulouse, 31000<br><br><br>2025-2026<br>Bachelor Graphic Design 2ème année<br>•<br>LISAA Toulouse - Ecole Arts Appliqués,<br>Design & Multimédia, Campus Enova<br>Labège, 31670</p>
+      <p data-key="projets-pro">Création de contenu Instagram • Réalisation de courts métrages • Marque de vêtement française Graphiste d’un E-roman de développement personnel • Compositeur indépendant & feats</p>
+      <p data-key="soft-skills">Curieux • Créatif • Passionné • Ponctuel • Rigoureux • Autonome • Travail d'équipe <br> Adaptabilité logicielle • Esprit critique • Veille technologique • Veille graphique</p>
+      <p data-key="hard-skills">Logiciels de la suite Adobe : PremierePro • After Effects • InDesign • Photoshop • Illustrator • Lightroom <br> Ableton • DaVinciResolve • Figma • Blender • ChatGPT et Claude IA • Github • Visual Studio Code</p>
+    </div>
+
   </section>
 
   <!-- ══════════ AFFICHES ══════════ -->
@@ -712,7 +797,7 @@
       <div class="poster-card" data-src="assets/Taped-Poster-Mockup_Small_3.png"
         data-title="BACKROOMS"
         data-desc="EXPEDITION 0 est une expérience immersive à grande échelle de l'agence toulousaine Immersive Games by Momento Event, plongeant les joueurs dans les Backrooms — cet espace liminal infini popularisé en 2020 par le créateur Kane Pixels, dont la vidéo Found Footage questionnait déjà la frontière entre réalité et imaginaire. Pour cette affiche fictive, le parti pris visuel s'articule autour de l'horreur, du surnaturel et de la cinématographie, en s'inspirant de la direction artistique du film Backrooms et de sa typographie minimaliste. Le regard est immédiatement attiré vers le centre de l'image, où une lueur colorée contraste avec l'ensemble et révèle deux silhouettes — l'une humaine, l'autre monstrueuse. Le cadre Found Footage rappelle l'origine même des Backrooms, tandis que le fond glitché et saturé ancre l'affiche dans un espace visuel liminal hors de la réalité, brisant le 4e mur (avec des rappels du motif représentatif de l'étage 0 des 'Backrooms'). Le titre lui-même devient un élément graphique : texturé, modifié, fondu dans la composition."
-        data-tags="Blender · Photoshop · Affiche événementielle · 2025">
+        data-tags="Blender · Photoshop · Affiche événementielle · 2026">
         <div class="poster-inner">
           <img src="assets/Taped-Poster-Mockup_Small_3.png" alt="Backrooms" />
         </div>
@@ -767,49 +852,49 @@
 
   <!-- ══════════ PROJETS ══════════ -->
   <section id="projets">
-    <video id="bg-video" autoplay muted loop playsinline>
+    <video id="bg-video-2" autoplay muted loop playsinline>
       <source src="assets/PORTFOLIO_PROJETS_SECTION.mp4" type="video/mp4">
     </video>
     <p class="projets-title">/Projets</p>
     <div class="projets-grid">
 
       <div class="disk-card" onclick="window.location.href='projet_1.html'">
+        <div class="disk-label">
+          <span class="disk-num">PROJET 1</span>
+          <span class="disk-name">PICK YOUR CREW 2</span>
+        </div>
         <div class="disk-inner">
           <img src="assets/Floppy_Disk.png" alt="Disk 1" />
-        </div>
-        <div class="disk-label">
-          <span class="disk-num">DISK 1</span>
-          <span class="disk-name">PICK YOUR CREW 2</span>
         </div>
       </div>
 
       <div class="disk-card" onclick="window.location.href='projet_2.html'">
+        <div class="disk-label">
+          <span class="disk-num">PROJET 2</span>
+          <span class="disk-name">DANCE NO ONE CARES</span>
+        </div>
         <div class="disk-inner">
           <img src="assets/Floppy_Disk_2.png" alt="Disk 2" />
-        </div>
-        <div class="disk-label">
-          <span class="disk-num">DISK 2</span>
-          <span class="disk-name">DANCE NO ONE CARES</span>
         </div>
       </div>
 
       <div class="disk-card" onclick="window.location.href='projet_3.html'">
+        <div class="disk-label">
+          <span class="disk-num">PROJET 3</span>
+          <span class="disk-name">SWO — COLLECTION AD ASTRA</span>
+        </div>
         <div class="disk-inner">
           <img src="assets/Floppy_Disk_3.png" alt="Disk 3" />
-        </div>
-        <div class="disk-label">
-          <span class="disk-num">DISK 3</span>
-          <span class="disk-name">SWO — COLLECTION STAR</span>
         </div>
       </div>
 
       <div class="disk-card" onclick="window.location.href='projet_4.html'">
+        <div class="disk-label">
+          <span class="disk-num">PROJET 4</span>
+          <span class="disk-name">KAKUMO — FAITH HOPE LOVE</span>
+        </div>
         <div class="disk-inner">
           <img src="assets/Floppy_Disk_4.png" alt="Disk 4" />
-        </div>
-        <div class="disk-label">
-          <span class="disk-num">DISK 4</span>
-          <span class="disk-name">KAKUMO — FAITH HOPE LOVE</span>
         </div>
       </div>
 
@@ -818,6 +903,7 @@
 
   <!-- ══════════ CONTACTS ══════════ -->
   <section id="contacts">
+    <p class="contacts-title">/Contacts</p>
     <div class="contacts-row">
 
       <!-- Email -->
@@ -876,6 +962,47 @@
       }, { once: true });
     }, 400);
 
+    // À propos — hover titles → show matching text in fixed zone
+    const aproposTitles = document.querySelectorAll('.apropos-title-item');
+    const aproposTexts  = document.querySelectorAll('.apropos-text-zone p');
+    aproposTitles.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        const key = item.dataset.key;
+        aproposTexts.forEach(p => p.classList.toggle('visible', p.dataset.key === key));
+      });
+      item.addEventListener('mouseleave', () => {
+        aproposTexts.forEach(p => p.classList.remove('visible'));
+      });
+    });
+
+    // Image à propos : entrée puis flottement en boucle
+    const aproposImg = document.querySelector('.apropos-img');
+    if (aproposImg) {
+      setTimeout(() => {
+        aproposImg.style.animation = 'float 6s ease-in-out infinite';
+        aproposImg.style.opacity = '1';
+      }, 1300);
+    }
+
+    // Disques projets : entrée groupée → spread → float idle
+    const diskCards = document.querySelectorAll('.disk-card');
+    const diskObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          diskCards.forEach((card, i) => {
+            card.classList.add('animate-in');
+            // Après l'animation d'entrée, passer en float idle
+            setTimeout(() => {
+              card.classList.remove('animate-in');
+              card.classList.add('floating');
+            }, 1100 + i * 100);
+          });
+          diskObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    if (diskCards.length) diskObserver.observe(diskCards[0].closest('.projets-grid'));
+
     // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', e => {
@@ -883,18 +1010,6 @@
         const t = document.querySelector(link.getAttribute('href'));
         if (t) t.scrollIntoView({ behavior: 'smooth' });
       });
-    });
-
-    // Parallax hero
-    const video = document.getElementById('bg-video');
-    const hero  = document.getElementById('hero');
-    hero.addEventListener('mousemove', e => {
-      const x = (e.clientX / window.innerWidth  - 0.5) * 14;
-      const y = (e.clientY / window.innerHeight - 0.5) * 10;
-      video.style.transform = `translate(${x}px, ${y}px) scale(1.04)`;
-    });
-    hero.addEventListener('mouseleave', () => {
-      video.style.transform = 'translate(0,0) scale(1.04)';
     });
 
     // Fade-in scroll

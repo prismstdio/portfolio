@@ -309,6 +309,29 @@
       .apropos-img { width: 160px; }
     }
 
+    .cv-btn {
+      font-family: "Google Sans", sans-serif;
+      font-weight: bold;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      color: var(--red);
+      text-decoration: none;
+      text-shadow: 0 0 2px var(--red);
+      background: transparent;
+      padding: 14px 22px;
+      border: 2px solid transparent;
+      transition:
+        color        .38s ease,
+        background   .38s ease,
+        border-color .38s ease,
+        padding      .38s cubic-bezier(.25,1,.5,1);
+    }
+    .cv-btn:hover {
+      color: var(--white);
+      background: var(--red);
+      border-color: var(--red);
+    }
+
     /* ═══════════════════════════════
        AFFICHES
     ═══════════════════════════════ */
@@ -759,6 +782,7 @@
       <div class="apropos-title-item" data-key="projets-pro"><h3>Projets Pro</h3></div>
       <div class="apropos-title-item" data-key="soft-skills"><h3>Soft Skills</h3></div>
       <div class="apropos-title-item" data-key="hard-skills"><h3>Hard Skills</h3></div>
+      <a class="cv-btn" href="https://acrobat.adobe.com/id/urn:aaid:sc:EU:5635930d-65c7-4f32-878a-c4f2d46cae35" download>↓ Télécharger le CV</a>
     </div>
 
     <div class="apropos-text-zone">

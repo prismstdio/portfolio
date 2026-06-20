@@ -65,16 +65,107 @@
       padding-top:80px;
     }
 
-    /* Vidéo réduite, calée à gauche */
-    #bg-video{
-      position:absolute;
-      top:50%;
-      left:50%;
-      width:80%;
-      transform:translate(-50%,-50%);
-      object-fit:cover;
-      filter:grayscale(100%) contrast(1.05);
-      z-index:0;
+    /* Vidéo plein écran en fond de la section hero */
+    #hero-video-wrap {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      cursor: none;
+      overflow: hidden;
+    }
+
+    #hero-thumb {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(100%) contrast(1.05);
+      background: #0a0a0a; /* évite le blanc pendant le chargement */
+    }
+
+    /* Iframe YouTube en fond, surdimensionné pour masquer les bords/contrôles,
+       caché tant qu'il n'a pas fini de charger (le thumbnail reste visible). */
+    #hero-bg-iframe {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 130%;
+      height: 130%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: grayscale(100%) contrast(1.05);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #hero-bg-iframe.loaded {
+      opacity: 1;
+    }
+
+    /* Overlay play : remplace le curseur, suit la souris, effet négatif */
+    #hero-play-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 70px; height: 70px;
+      margin-left: -35px;
+      margin-top: -35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      mix-blend-mode: difference;
+    }
+    #hero-play-overlay.visible {
+      opacity: 1;
+    }
+
+    #hero-play-icon {
+      width: 70px; height: 70px;
+      display: block;
+    }
+    #hero-play-icon circle {
+      fill: #FFFFFF;
+    }
+    #hero-play-icon path {
+      fill: #000000;
+    }
+
+    /* ── Fenêtre modale vidéo (même esprit que la lightbox affiches) ── */
+    .video-modal {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0);
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      transition: background 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .video-modal.active {
+      background: rgba(0,0,0,0.92);
+      pointer-events: all;
+    }
+    .video-modal-inner {
+      width: min(78vw, 1100px);
+      aspect-ratio: 16/9;
+      opacity: 0;
+      transform: scale(0.93) translateY(16px);
+      transition:
+        opacity   0.55s cubic-bezier(0.16,1,0.3,1),
+        transform 0.55s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+      position: relative;
+    }
+    .video-modal.active .video-modal-inner {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+    .video-modal-inner iframe {
+      width: 100%; height: 100%;
+      border: none;
+      display: block;
     }
 
     #bg-video-2{
@@ -756,9 +847,23 @@
   <!-- ══════════ HERO ══════════ -->
   <section id="hero">
     <h3 id="hero-name">OLIVIER GIBERT</h3>
-    <video id="bg-video" autoplay muted loop playsinline>
-      <source src="assets/PAGE_D_ACCUEIL2.mp4" type="video/mp4">
-    </video>
+
+    <!-- data-youtube : lien de la vidéo showreel YouTube -->
+    <div id="hero-video-wrap" data-youtube="https://youtu.be/Zkxbw6YUl7o">
+      <img id="hero-thumb" alt="Showreel Olivier Gibert" />
+      <iframe id="hero-bg-iframe"
+        allow="autoplay; encrypted-media"
+        title="Showreel background"
+        frameborder="0"></iframe>
+    </div>
+
+    <div id="hero-play-overlay">
+      <svg viewBox="0 0 80 80" id="hero-play-icon" width="70" height="70">
+        <circle cx="40" cy="40" r="38" />
+        <path d="M32 26 L56 40 L32 54 Z" />
+      </svg>
+    </div>
+
     <nav>
       <div class="hero-content">
         <a href="#a-propos" class="nav-btn btn-apropos">A PROPOS</a>
@@ -872,6 +977,11 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ══════════ VIDEO MODAL (showreel hero) ══════════ -->
+  <div class="video-modal" id="video-modal">
+    <div class="video-modal-inner" id="video-modal-inner"></div>
   </div>
 
   <!-- ══════════ PROJETS ══════════ -->
@@ -1027,6 +1137,123 @@
     }, { threshold: 0.3 });
     if (diskCards.length) diskObserver.observe(diskCards[0].closest('.projets-grid'));
 
+    // ═══ Overlay play : remplace le curseur, pilote aussi la distortion liquide ═══
+    let heroMouseX = 0.5, heroMouseY = 0.5, heroHovering = false;
+
+    (function initHeroCursor() {
+      const wrap    = document.getElementById('hero-video-wrap');
+      const overlay = document.getElementById('hero-play-overlay');
+      if (!wrap || !overlay) return;
+
+      wrap.addEventListener('mousemove', e => {
+        overlay.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        const rect = wrap.getBoundingClientRect();
+        heroMouseX = (e.clientX - rect.left) / rect.width;
+        heroMouseY = 1.0 - (e.clientY - rect.top) / rect.height;
+      });
+      wrap.addEventListener('mouseenter', e => {
+        overlay.classList.add('visible');
+        overlay.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        heroHovering = true;
+      });
+      wrap.addEventListener('mouseleave', () => {
+        overlay.classList.remove('visible');
+        heroHovering = false;
+      });
+    })();
+
+    // ═══ Thumbnail YouTube (image fixe, pas de lecteur tant qu'il n'y a pas eu de clic) ═══
+    (function initHeroThumb() {
+      const wrap   = document.getElementById('hero-video-wrap');
+      const thumb  = document.getElementById('hero-thumb');
+      const bgIframe = document.getElementById('hero-bg-iframe');
+      if (!wrap || !thumb) return;
+
+      function youtubeId(url) {
+        try {
+          const u = new URL(url);
+          if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
+          return u.searchParams.get('v') || u.pathname.split('/').pop();
+        } catch (e) { return ''; }
+      }
+
+      const id = youtubeId(wrap.dataset.youtube);
+      if (!id) return;
+
+      // maxresdefault si disponible, sinon fallback hqdefault (toujours présent)
+      const hq = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+      const fallback = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+      thumb.src = hq;
+      thumb.addEventListener('error', () => { thumb.src = fallback; }, { once: true });
+
+      // Lecture auto en fond : muet, en boucle, sans contrôles ni branding visible.
+      // playsinline=1 + modestbranding=1 + controls=0 + rel=0 limitent l'UI YouTube ;
+      // l'iframe est en plus surdimensionné en CSS pour masquer ce qui resterait.
+      if (bgIframe) {
+        const params = new URLSearchParams({
+          autoplay: '1',
+          mute: '1',
+          loop: '1',
+          playlist: id,
+          controls: '0',
+          modestbranding: '1',
+          rel: '0',
+          showinfo: '0',
+          playsinline: '1',
+          disablekb: '1',
+          iv_load_policy: '3'
+        });
+        bgIframe.src = `https://www.youtube.com/embed/${id}?${params.toString()}`;
+        bgIframe.addEventListener('load', () => {
+          bgIframe.classList.add('loaded');
+        }, { once: true });
+      }
+    })();
+
+    // ═══ Modal vidéo showreel (clic sur le hero → lecteur YouTube) ═══
+    (function initHeroVideoModal() {
+      const wrap  = document.getElementById('hero-video-wrap');
+      const modal = document.getElementById('video-modal');
+      const inner = document.getElementById('video-modal-inner');
+      if (!wrap || !modal || !inner) return;
+
+      function youtubeEmbedUrl(url) {
+        let id = '';
+        try {
+          const u = new URL(url);
+          if (u.hostname.includes('youtu.be')) {
+            id = u.pathname.slice(1);
+          } else {
+            id = u.searchParams.get('v') || u.pathname.split('/').pop();
+          }
+        } catch (e) { /* lien invalide */ }
+        return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : null;
+      }
+
+      function openVideoModal() {
+        const url = wrap.dataset.youtube;
+        const embed = youtubeEmbedUrl(url);
+        if (!embed) return;
+        inner.innerHTML = `<iframe src="${embed}" title="Showreel" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeVideoModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        setTimeout(() => { inner.innerHTML = ''; }, 550);
+      }
+
+      wrap.addEventListener('click', openVideoModal);
+      modal.addEventListener('click', e => {
+        if (e.target === modal) closeVideoModal();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeVideoModal();
+      });
+    })();
+
     // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', e => {
@@ -1036,22 +1263,35 @@
       });
     });
 
-    // Fade-in scroll
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.style.opacity = '1';
-          e.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, { threshold: 0.08 });
+    // ═══ Fade-in à l'arrivée en section (simple et fiable) ═══
+    // Chaque élément apparaît une fois lorsqu'il entre dans le viewport.
+    try {
+      const revealTargets = document.querySelectorAll(
+        '.poster-card, .affiches-title, .projets-title, .contacts-title, .contacts-row, .apropos-title-item, .cv-btn'
+      );
 
-    document.querySelectorAll('.poster-card').forEach((el, i) => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(24px)';
-      el.style.transition = `opacity 0.5s ease ${i * 0.07}s, transform 0.5s ease ${i * 0.07}s`;
-      observer.observe(el);
-    });
+      revealTargets.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(28px)';
+        el.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+      });
+
+      const revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      revealTargets.forEach(el => revealObserver.observe(el));
+    } catch (err) {
+      console.warn('Fade-in désactivé :', err);
+      document.querySelectorAll('.poster-card, .affiches-title, .projets-title, .contacts-title, .contacts-row, .apropos-title-item, .cv-btn')
+        .forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+    }
 
     // Lightbox
     const lightbox   = document.getElementById('lightbox');

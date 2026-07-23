@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creator — Olivier Gibert</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script defer src="main.js"></script>
+</head>
+<body>
+
+  <!-- IMMERSION LAYERS -->
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="progress"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- INTRO -->
+  <div id="intro-overlay" data-testid="intro-overlay">
+    <div id="intro-word"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-content">
+      <a href="index.html" class="nav-brand" data-testid="nav-brand">Olivier Gibert.</a>
+      <div class="nav-links">
+        <a href="creator.html" class="nav-btn" data-page="creator.html" data-testid="nav-creator">CREATOR</a>
+        <a href="galerie.html" class="nav-btn" data-page="galerie.html" data-testid="nav-galerie">GALERIE</a>
+        <a href="projets.html"  class="nav-btn" data-page="projets.html" data-testid="nav-projets">PROJETS</a>
+        <a href="contacts.html" class="nav-btn" data-page="contacts.html" data-testid="nav-contacts">CONTACTS</a>
+      </div>
+      <a class="nav-cv-btn" data-testid="nav-cv" href="https://acrobat.adobe.com/id/urn:aaid:sc:EU:1fd2435f-43a8-4d2a-a552-6d10c052c47f" target="_blank" download>↓ CV</a>
+    </div>
+  </nav>
+
+  <!-- CREATOR -->
+  <section id="creator">
+    <div class="section-head">
+      <h2 class="creator-title split-title" id="creator-title" data-testid="creator-title">
+        <span class="ln" data-word="/Creator"></span>
+      </h2>
+    </div>
+
+    <p class="reel-intro">Derniers réels sous l'identité <a href="https://www.instagram.com/prism.stdio" target="_blank">@prism.stdio</a> — clique sur une vignette pour l'agrandir.</p>
+
+    <!--
+      Pour ajouter un reel, deux options sur la tuile "reel-tile" :
+
+      1) Fichier vidéo fourni (rendu 100% propre, sans habillage Instagram) :
+      <div class="reel-tile" data-video="assets/reels/nom-du-fichier.mp4" data-testid="reel-N">
+        <img class="reel-cover" src="assets/reels/nom-du-fichier.jpg" alt="" />
+        <div class="reel-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      2) Pas de fichier vidéo, juste le lien (YouTube ou Instagram) : la couverture
+         se remplit toute seule si c'est un lien YouTube ; pour Instagram, il faut
+         fournir une image de couverture toi-même (voir option 1).
+      <div class="reel-tile" data-reel="https://www.instagram.com/reel/XXXX/ ou https://youtube.com/shorts/XXXX" data-testid="reel-N">
+        <img class="reel-cover" src="assets/reels/nom-du-fichier.jpg" alt="" />
+        <div class="reel-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+    -->
+    <div class="reel-stack-wrap">
+      <div class="reel-stack" id="reel-stack">
+        <!-- Reel 1 — lien fourni, en attente de l'image de couverture / du fichier vidéo -->
+        <div class="reel-tile placeholder" data-reel="https://youtube.com/shorts/Eeo89IEb6XI?feature=share" data-testid="reel-1">
+          <div class="reel-ph-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <span>@prism.stdio<br>Voir sur Instagram</span>
+        </div>
+        <div class="reel-tile placeholder" data-reel="https://youtube.com/shorts/SQ_XSM4ujXE?feature=share" data-testid="reel-2">
+          <div class="reel-ph-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <span>Reel à venir</span>
+        </div>
+        <div class="reel-tile placeholder" data-reel="https://youtube.com/shorts/PzCTwzZ-aig?feature=share" data-testid="reel-3">
+          <div class="reel-ph-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <span>Reel à venir</span>
+        </div>
+        <div class="reel-tile placeholder" data-reel="https://youtube.com/shorts/rbQgre4NDaA?feature=share" data-testid="reel-4">
+          <div class="reel-ph-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <span>Reel à venir</span>
+        </div>
+        <div class="reel-tile placeholder" data-reel="https://youtube.com/shorts/y_E-VDLsyMY?feature=share" data-testid="reel-5">
+          <div class="reel-ph-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <span>Reel à venir</span>
+        </div>
+        <div class="reel-tile placeholder" data-reel="https://youtube.com/shorts/h_IJBU3srGI?feature=share" data-testid="reel-6"
+          <div class="reel-ph-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <span>Reel à venir</span>
+        </div>
+      </div>
+
+      <div class="reel-stack-nav">
+        <button class="reel-nav-btn" id="reel-prev" aria-label="Reel précédent">‹</button>
+        <div class="reel-stack-dots" id="reel-dots"></div>
+        <button class="reel-nav-btn" id="reel-next" aria-label="Reel suivant">›</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- VIDEO MODAL (showreel + reels) -->
+  <div class="video-modal" id="video-modal">
+    <div class="video-modal-inner" id="video-modal-inner"></div>
+  </div>
+
+</body>
+</html>

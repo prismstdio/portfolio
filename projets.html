@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projets — Olivier Gibert</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script defer src="main.js"></script>
+</head>
+<body>
+
+  <!-- IMMERSION LAYERS -->
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="progress"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- INTRO -->
+  <div id="intro-overlay" data-testid="intro-overlay">
+    <div id="intro-word"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-content">
+      <a href="index.html" class="nav-brand" data-testid="nav-brand">Olivier Gibert.</a>
+      <div class="nav-links">
+        <a href="creator.html" class="nav-btn" data-page="creator.html" data-testid="nav-creator">CREATOR</a>
+        <a href="galerie.html" class="nav-btn" data-page="galerie.html" data-testid="nav-galerie">GALERIE</a>
+        <a href="projets.html"  class="nav-btn" data-page="projets.html" data-testid="nav-projets">PROJETS</a>
+        <a href="contacts.html" class="nav-btn" data-page="contacts.html" data-testid="nav-contacts">CONTACTS</a>
+      </div>
+      <a class="nav-cv-btn" data-testid="nav-cv" href="https://acrobat.adobe.com/id/urn:aaid:sc:EU:1fd2435f-43a8-4d2a-a552-6d10c052c47f" target="_blank" download>↓ CV</a>
+    </div>
+  </nav>
+
+  <!-- PROJETS -->
+  <section id="projets">
+    <video id="bg-video-2" autoplay muted loop playsinline>
+      <source src="assets/PORTFOLIO_PROJETS_SECTION.mp4" type="video/mp4">
+    </video>
+    <div class="section-head">
+      <h2 class="projets-title split-title" id="projets-title" data-testid="projets-title">
+        <span class="ln" data-word="/Projets"></span>
+      </h2>
+    </div>
+    <div class="projets-grid">
+      <div class="disk-card" data-href="projet_1.html" data-testid="project-1">
+        <div class="disk-label"><span class="disk-num">PROJET 1</span><span class="disk-name">PICK YOUR CREW 2</span></div>
+        <div class="disk-inner"><img src="assets/Floppy_Disk.png" alt="Disk 1" /></div>
+      </div>
+      <div class="disk-card" data-href="projet_2.html" data-testid="project-2">
+        <div class="disk-label"><span class="disk-num">PROJET 2</span><span class="disk-name">DANCE NO ONE CARES</span></div>
+        <div class="disk-inner"><img src="assets/Floppy_Disk_2.png" alt="Disk 2" /></div>
+      </div>
+      <div class="disk-card" data-href="projet_3.html" data-testid="project-3">
+        <div class="disk-label"><span class="disk-num">PROJET 3</span><span class="disk-name">SWO — COLLECTION AD ASTRA</span></div>
+        <div class="disk-inner"><img src="assets/Floppy_Disk_3.png" alt="Disk 3" /></div>
+      </div>
+      <div class="disk-card" data-href="projet_4.html" data-testid="project-4">
+        <div class="disk-label"><span class="disk-num">PROJET 4</span><span class="disk-name">KAKUMO — FAITH HOPE LOVE</span></div>
+        <div class="disk-inner"><img src="assets/Floppy_Disk_4.png" alt="Disk 4" /></div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

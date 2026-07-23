@@ -4,28 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dance No One Cares — Olivier Gibert</title>
+
+  <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="project.css" />
+
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script defer src="main.js"></script>
   <script defer src="project.js"></script>
 </head>
 <body>
-  <div id="grain"></div><div id="scanlines"></div><div id="vignette"></div>
-  <div id="progress"></div><div id="scroll-readout">00 / 100</div><div id="cursor-ring"></div>
 
-  <div id="intro-overlay"><div id="intro-word">Dance&nbsp;No&nbsp;One&nbsp;Cares</div></div>
-  <a href="index.html#projets" class="back-btn">← Projets</a>
+  <!-- IMMERSION LAYERS -->
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="progress"></div>
+  <div id="cursor-ring"></div>
 
+  <!-- INTRO -->
+  <div id="intro-overlay" data-testid="intro-overlay">
+    <div id="intro-word"></div>
+  </div>
+
+  <a href="projets.html" class="back-btn" data-testid="back-to-projets">← Projets</a>
+
+  <!-- HERO -->
   <section id="hero">
     <div id="hero-media">
-      <video autoplay muted loop playsinline><source src="assets/DANCENOONECARES_FIGMA.mp4" type="video/mp4"></video>
+      <video autoplay muted loop playsinline>
+        <source src="assets/DANCENOONECARES_FIGMA.mp4" type="video/mp4">
+      </video>
     </div>
     <div class="hero-gradient"></div>
+
     <div class="hero-header">
       <div class="hero-left">
         <span class="hero-tag">Projet 02 — Graphisme &amp; Édition</span>
-        <h1 class="hero-title">Dance No One Cares</h1>
+        <h1 class="hero-title split-title" id="hero-title" data-testid="hero-title">
+          <span class="ln" data-word="Dance No One Cares"></span>
+        </h1>
         <p class="hero-subtitle">Carnet de danse — Création éditoriale</p>
       </div>
       <div class="hero-right">
@@ -34,57 +52,108 @@
         <span class="hero-meta">Rôle <span>DA · Édition · Print · Réseaux</span></span>
       </div>
     </div>
-    <div id="scroll-cue"><span>SCROLL</span><span class="bar"></span></div>
+
+    <a id="scroll-cue" href="#infos"><span>SCROLL</span><span class="bar"></span></a>
   </section>
 
+  <!-- INFOS -->
   <section id="infos">
-    <div class="infos-sticky">
-      <div class="infos-disk-wrap" data-parallax="0.12"><img src="assets/Floppy_Disk_2.png" alt="Dance No One Cares" /></div>
-      <span class="infos-disk-caption">DISK 02 — DANCE NO ONE CARES — 2026</span>
-    </div>
     <div class="infos-content">
-      <span class="section-kicker reveal">Étude de cas</span>
-      <div class="info-block reveal"><h4>Le projet</h4><p>Dance No One Cares est un carnet de danse conçu et édité sous l'identité prism.stdio. Ce projet éditorial est né d'une conviction simple : la danse est un medium de liberté. Le carnet s'adresse à quiconque ressent le besoin de bouger librement, sans avoir peur du regard des autres. Un manifeste graphique autant qu'un objet à tenir entre les mains.</p></div>
-      <div class="info-block reveal"><h4>Direction artistique</h4><p>Le parti pris visuel est brut et contrasté : typographie manuscrite monumentale sur fond photographique, instant capturé en mouvement, prise de vue documentaire dans les places de Toulouse. L'intérieur mêle intimité personnelle et photographies de danse, créant un rythme entre l'intime et le public.</p></div>
-      <div class="info-block reveal"><h4>Livrables</h4><p>Carnet A5 format print · Mise en page intérieure · Déclinaison numérique pour réseaux sociaux · Shooting photo en extérieur sur les places de Toulouse. Le carnet a été imprimé et distribué physiquement.</p></div>
-      <div class="info-block reveal"><h4>Outils &amp; rôle</h4><p>Photoshop · Lightroom · InDesign · Direction artistique · Édition · Photographie · Print · 2026</p></div>
+      <div class="info-block reveal">
+        <h4>Le projet</h4>
+        <p>Dance No One Cares est un carnet de danse conçu et édité sous l'identité prism.stdio. Ce projet éditorial est né d'une conviction simple : la danse est un medium de liberté. Le carnet s'adresse à quiconque ressent le besoin de bouger librement, sans avoir peur du regard des autres. Un manifeste graphique autant qu'un objet à tenir entre les mains.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Direction artistique</h4>
+        <p>Le parti pris visuel est brut et contrasté : typographie manuscrite monumentale sur fond photographique, instant capturé en mouvement, prise de vue documentaire dans les places de Toulouse. L'intérieur mêle intimité personnelle et photographies de danse, créant un rythme entre l'intime et le public.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Livrables</h4>
+        <p>Carnet A5 format print · Mise en page intérieure · Déclinaison numérique pour réseaux sociaux · Shooting photo en extérieur sur les places de Toulouse. Le carnet a été imprimé et distribué physiquement.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Outils &amp; rôle</h4>
+        <p>Photoshop · Lightroom · InDesign · Direction artistique · Édition · Photographie · Print · 2026</p>
+      </div>
+    </div>
+
+    <div class="infos-divider"></div>
+
+    <div class="infos-disk-block">
+      <div class="infos-disk-wrap"><img src="assets/Floppy_Disk_2.png" alt="Dance No One Cares" /></div>
+      <span class="infos-disk-caption">Disk 02 — Dance No One Cares — 2026</span>
     </div>
   </section>
 
+  <!-- MOCKUPS -->
   <section class="gallery-section">
-    <div class="gallery-head reveal-head">
-      <span class="section-kicker">Aperçus</span>
+    <div class="section-head reveal-head">
       <h2 class="section-title">/Mockups</h2>
     </div>
     <div class="gallery-grid">
-      <div class="mockup-item reveal" data-src="assets/Brochure_Mockup_3.jpg"><div class="mockup-inner"><img src="assets/Brochure_Mockup_3.jpg" alt="Dance No One Cares — Brochure mockup" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/PXL_20260509_164822426-2.jpg"><div class="mockup-inner"><img src="assets/PXL_20260509_164822426-2.jpg" alt="Dance No One Cares — Photo" /></div></div>
+      <div class="mockup-item reveal" data-src="assets/Brochure_Mockup_3.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/Brochure_Mockup_3.jpg" alt="Dance No One Cares — Brochure mockup" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/PXL_20260509_164822426-2.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/PXL_20260509_164822426-2.jpg" alt="Dance No One Cares — Photo" /></div>
+      </div>
     </div>
   </section>
 
+  <!-- PHOTOS -->
   <section class="gallery-section alt">
-    <div class="gallery-head reveal-head">
-      <span class="section-kicker">Série photo — Toulouse</span>
+    <div class="section-head reveal-head">
       <h2 class="section-title">/Photos</h2>
     </div>
     <div class="gallery-grid cols-4">
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES.jpg" alt="Dance No One Cares" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES3.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES3.jpg" alt="Dance No One Cares" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES5.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES5.jpg" alt="Dance No One Cares" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES9.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES9.jpg" alt="Dance No One Cares" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES10.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES10.jpg" alt="Dance No One Cares" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES13.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES13.jpg" alt="Dance No One Cares" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES14.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES14.jpg" alt="Dance No One Cares" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES16.jpg"><div class="mockup-inner"><img src="assets/DANCENOONECARES16.jpg" alt="Dance No One Cares" /></div></div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES.jpg" alt="Dance No One Cares" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES3.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES3.jpg" alt="Dance No One Cares" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES5.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES5.jpg" alt="Dance No One Cares" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES9.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES9.jpg" alt="Dance No One Cares" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES10.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES10.jpg" alt="Dance No One Cares" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES13.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES13.jpg" alt="Dance No One Cares" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES14.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES14.jpg" alt="Dance No One Cares" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/DANCENOONECARES16.jpg" data-title="Dance No One Cares">
+        <div class="mockup-inner"><img src="assets/DANCENOONECARES16.jpg" alt="Dance No One Cares" /></div>
+      </div>
     </div>
   </section>
 
+  <!-- FOOTER / NEXT PROJECT -->
   <section id="proj-footer">
     <span class="next-label reveal">Projet suivant</span>
     <a href="projet_3.html" class="next-link reveal">SWO — Collection Ad Astra <span class="arrow">→</span></a>
     <p class="footer-sig reveal">© 2026 Olivier Gibert — prism.stdio · Kakumo</p>
   </section>
 
-  <div class="mlightbox" id="mlightbox"><img class="mlightbox-img" id="mlightbox-img" src="" alt="" /></div>
+  <!-- MOCKUP LIGHTBOX (images only — reuses the site's lightbox visual language) -->
+  <div class="lightbox" id="mlightbox" data-testid="mlightbox">
+    <div class="lightbox-inner">
+      <div class="lightbox-frame"><img class="lightbox-img" id="mlightbox-img" src="" alt="" /></div>
+    </div>
+  </div>
+
+  <!-- VIDEO MODAL (mockup videos, if any are added later) -->
+  <div id="hero-play-overlay">
+    <svg viewBox="0 0 80 80" id="hero-play-icon" width="70" height="70">
+      <circle cx="40" cy="40" r="38" /><path d="M32 26 L56 40 L32 54 Z" />
+    </svg>
+  </div>
+  <div class="video-modal" id="video-modal"><div class="video-modal-inner" id="video-modal-inner"></div></div>
+
 </body>
 </html>

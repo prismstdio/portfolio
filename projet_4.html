@@ -4,26 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Faith Hope Love — Olivier Gibert</title>
+
+  <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="project.css" />
+
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script defer src="main.js"></script>
   <script defer src="project.js"></script>
 </head>
 <body>
-  <div id="grain"></div><div id="scanlines"></div><div id="vignette"></div>
-  <div id="progress"></div><div id="scroll-readout">00 / 100</div><div id="cursor-ring"></div>
 
-  <div id="intro-overlay"><div id="intro-word">Faith&nbsp;Hope&nbsp;Love</div></div>
-  <a href="index.html#projets" class="back-btn">← Projets</a>
+  <!-- IMMERSION LAYERS -->
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="progress"></div>
+  <div id="cursor-ring"></div>
 
+  <!-- INTRO -->
+  <div id="intro-overlay" data-testid="intro-overlay">
+    <div id="intro-word"></div>
+  </div>
+
+  <a href="projets.html" class="back-btn" data-testid="back-to-projets">← Projets</a>
+
+  <!-- HERO -->
   <section id="hero">
-    <div id="hero-media"><img src="assets/POCHETTE.jpg" alt="Kakumo — Faith Hope Love" /></div>
+    <div id="hero-media">
+      <img src="assets/POCHETTE.jpg" alt="Kakumo — Faith Hope Love" />
+    </div>
     <div class="hero-gradient"></div>
+
     <div class="hero-header">
       <div class="hero-left">
         <span class="hero-tag">Projet 04 — Production musicale &amp; DA</span>
-        <h1 class="hero-title">Faith Hope Love</h1>
+        <h1 class="hero-title split-title" id="hero-title" data-testid="hero-title">
+          <span class="ln" data-word="Faith Hope Love"></span>
+        </h1>
         <p class="hero-subtitle">Kakumo — EP 6 titres — 2026</p>
       </div>
       <div class="hero-right">
@@ -32,44 +50,86 @@
         <span class="hero-meta">Rôle <span>Production · DA · Mixage</span></span>
       </div>
     </div>
-    <div id="scroll-cue"><span>SCROLL</span><span class="bar"></span></div>
+
+    <a id="scroll-cue" href="#infos"><span>SCROLL</span><span class="bar"></span></a>
   </section>
 
+  <!-- INFOS -->
   <section id="infos">
-    <div class="infos-sticky">
-      <div class="infos-disk-wrap" data-parallax="0.12"><img src="assets/Floppy_Disk_4.png" alt="Kakumo — Faith Hope Love" /></div>
-      <span class="infos-disk-caption">DISK 04 — FAITH HOPE LOVE — 2026</span>
-    </div>
     <div class="infos-content">
-      <span class="section-kicker reveal">Étude de cas</span>
-      <div class="info-block reveal"><h4>Le projet</h4><p>Faith Hope Love est un EP d'ambient house de 6 titres, produit, composé et mixé sous le nom de scène Kakumo. Ce projet est un rappel que tu as le pouvoir de devenir la personne que tu souhaites être. Tu peux être libre. Tu as simplement besoin d'avoir foi en toi, de garder espoir, et d'aimer suffisamment tes rêves pour avoir la force de les atteindre. Chaque morceau représente une étape de ce voyage intérieur, entre textures ambiantes, synthés house et production électronique organique. La direction artistique traduit visuellement cette sensation d'espoir et d'élévation.</p></div>
-      <div class="info-block reveal"><h4>Direction artistique</h4><p>La pochette s'appuie sur un portrait en contre-plongée sous un ciel bleu intense — une image de lumière, d'élévation, d'aspiration. La typographie mixe trois registres : condensé bold pour FAITH, serif élégant pour HOPE, script fluide pour Love. À l'intérieur du digipack, la matière photographique devient abstraite — représentation de la foi, de l'espoir et de l'amour, pour concentrer l'attention sur la texture et l'émotion.</p></div>
-      <div class="info-block reveal"><h4>Livrables</h4><p>Pochette EP format numérique · Digipack CD complet (couverture, intérieur, CD sérigraphié, livret tracklist) · Vinyle complet · Visuels et promotion réseaux sociaux · Cover art déclinée pour toutes les plateformes de streaming.</p></div>
-      <div class="info-block reveal"><h4>Outils &amp; rôle</h4><p>Ableton Live · Photoshop · InDesign · Direction artistique · Vidéos promotionnelles · Print · Production musicale · 2026</p></div>
+      <div class="info-block reveal">
+        <h4>Le projet</h4>
+        <p>Faith Hope Love est un EP d'ambient house de 6 titres, produit, composé et mixé sous le nom de scène Kakumo. Ce projet est un rappel que tu as le pouvoir de devenir la personne que tu souhaites être. Tu peux être libre. Tu as simplement besoin d'avoir foi en toi, de garder espoir, et d'aimer suffisamment tes rêves pour avoir la force de les atteindre. Chaque morceau représente une étape de ce voyage intérieur, entre textures ambiantes, synthés house et production électronique organique. La direction artistique traduit visuellement cette sensation d'espoir et d'élévation.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Direction artistique</h4>
+        <p>La pochette s'appuie sur un portrait en contre-plongée sous un ciel bleu intense — une image de lumière, d'élévation, d'aspiration. La typographie mixe trois registres : condensé bold pour FAITH, serif élégant pour HOPE, script fluide pour Love. À l'intérieur du digipack, la matière photographique devient abstraite — représentation de la foi, de l'espoir et de l'amour, pour concentrer l'attention sur la texture et l'émotion.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Livrables</h4>
+        <p>Pochette EP format numérique · Digipack CD complet (couverture, intérieur, CD sérigraphié, livret tracklist) · Vinyle complet · Visuels et promotion réseaux sociaux · Cover art déclinée pour toutes les plateformes de streaming.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Outils &amp; rôle</h4>
+        <p>Ableton Live · Photoshop · InDesign · Direction artistique · Vidéos promotionnelles · Print · Production musicale · 2026</p>
+      </div>
+    </div>
+
+    <div class="infos-divider"></div>
+
+    <div class="infos-disk-block">
+      <div class="infos-disk-wrap"><img src="assets/Floppy_Disk_4.png" alt="Kakumo — Faith Hope Love" /></div>
+      <span class="infos-disk-caption">Disk 04 — Faith Hope Love — 2026</span>
     </div>
   </section>
 
+  <!-- MOCKUPS -->
   <section class="gallery-section">
-    <div class="gallery-head reveal-head">
-      <span class="section-kicker">Aperçus — Digipack &amp; Vinyle</span>
+    <div class="section-head reveal-head">
       <h2 class="section-title">/Mockups</h2>
     </div>
     <div class="gallery-grid">
-      <div class="mockup-item reveal" data-src="assets/Digipack_Mockup_3.jpg"><div class="mockup-inner"><img src="assets/Digipack_Mockup_3.jpg" alt="Faith Hope Love — Digipack" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/VINYLE_MOCKUP.jpg"><div class="mockup-inner"><img src="assets/VINYLE_MOCKUP.jpg" alt="Faith Hope Love — Vinyle mockup 1" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/VINYLE_MOCKUP_2.jpg"><div class="mockup-inner"><img src="assets/VINYLE_MOCKUP_2.jpg" alt="Faith Hope Love — Vinyle mockup 2" /></div></div>
-      <div class="mockup-item reveal" data-src="assets/VINYLE_MOCKUP_3.jpg"><div class="mockup-inner"><img src="assets/VINYLE_MOCKUP_3.jpg" alt="Faith Hope Love — Vinyle mockup 3" /></div></div>
+      <div class="mockup-item reveal" data-src="assets/Digipack_Mockup_3.jpg" data-title="Faith Hope Love">
+        <div class="mockup-inner"><img src="assets/Digipack_Mockup_3.jpg" alt="Faith Hope Love — Digipack" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/VINYLE_MOCKUP.jpg" data-title="Faith Hope Love">
+        <div class="mockup-inner"><img src="assets/VINYLE_MOCKUP.jpg" alt="Faith Hope Love — Vinyle mockup 1" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/VINYLE_MOCKUP_2.jpg" data-title="Faith Hope Love">
+        <div class="mockup-inner"><img src="assets/VINYLE_MOCKUP_2.jpg" alt="Faith Hope Love — Vinyle mockup 2" /></div>
+      </div>
+      <div class="mockup-item reveal" data-src="assets/VINYLE_MOCKUP_3.jpg" data-title="Faith Hope Love">
+        <div class="mockup-inner"><img src="assets/VINYLE_MOCKUP_3.jpg" alt="Faith Hope Love — Vinyle mockup 3" /></div>
+      </div>
     </div>
   </section>
 
-  <div class="action-bar"><a class="action-btn" href="https://linktr.ee/OlivierGibert" target="_blank">↗ Écouter l'EP</a></div>
+  <!-- LISTEN TO THE EP -->
+  <div class="action-bar">
+    <a class="action-btn" href="https://linktr.ee/OlivierGibert" target="_blank">↗ Écouter l'EP</a>
+  </div>
 
+  <!-- FOOTER / NEXT PROJECT -->
   <section id="proj-footer">
     <span class="next-label reveal">Retour au début</span>
     <a href="projet_1.html" class="next-link reveal">Pick Your Crew <span class="arrow">→</span></a>
     <p class="footer-sig reveal">© 2026 Olivier Gibert — prism.stdio · Kakumo</p>
   </section>
 
-  <div class="mlightbox" id="mlightbox"><img class="mlightbox-img" id="mlightbox-img" src="" alt="" /></div>
+  <!-- MOCKUP LIGHTBOX (images only — reuses the site's lightbox visual language) -->
+  <div class="lightbox" id="mlightbox" data-testid="mlightbox">
+    <div class="lightbox-inner">
+      <div class="lightbox-frame"><img class="lightbox-img" id="mlightbox-img" src="" alt="" /></div>
+    </div>
+  </div>
+
+  <!-- VIDEO MODAL (mockup videos, if any are added later) -->
+  <div id="hero-play-overlay">
+    <svg viewBox="0 0 80 80" id="hero-play-icon" width="70" height="70">
+      <circle cx="40" cy="40" r="38" /><path d="M32 26 L56 40 L32 54 Z" />
+    </svg>
+  </div>
+  <div class="video-modal" id="video-modal"><div class="video-modal-inner" id="video-modal-inner"></div></div>
+
 </body>
 </html>

@@ -4,28 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pick Your Crew — Olivier Gibert</title>
+
+  <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="project.css" />
+
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script defer src="main.js"></script>
   <script defer src="project.js"></script>
 </head>
 <body>
-  <div id="grain"></div><div id="scanlines"></div><div id="vignette"></div>
-  <div id="progress"></div><div id="scroll-readout">00 / 100</div><div id="cursor-ring"></div>
 
-  <div id="intro-overlay"><div id="intro-word">Pick&nbsp;Your&nbsp;Crew</div></div>
-  <a href="index.html#projets" class="back-btn">← Projets</a>
+  <!-- IMMERSION LAYERS -->
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="progress"></div>
+  <div id="cursor-ring"></div>
 
+  <!-- INTRO -->
+  <div id="intro-overlay" data-testid="intro-overlay">
+    <div id="intro-word"></div>
+  </div>
+
+  <a href="projets.html" class="back-btn" data-testid="back-to-projets">← Projets</a>
+
+  <!-- HERO -->
   <section id="hero">
     <div id="hero-media">
-      <video autoplay muted loop playsinline><source src="assets/PICKYOURCREW_FIGMA.mp4" type="video/mp4"></video>
+      <video autoplay muted loop playsinline>
+        <source src="assets/PICKYOURCREW_FIGMA.mp4" type="video/mp4">
+      </video>
     </div>
     <div class="hero-gradient"></div>
+
     <div class="hero-header">
       <div class="hero-left">
         <span class="hero-tag">Projet 01 — Direction artistique</span>
-        <h1 class="hero-title">Pick Your Crew</h1>
+        <h1 class="hero-title split-title" id="hero-title" data-testid="hero-title">
+          <span class="ln" data-word="Pick Your Crew"></span>
+        </h1>
         <p class="hero-subtitle">Battle de danse Afro &amp; Hiphop — 2nde édition</p>
       </div>
       <div class="hero-right">
@@ -34,49 +52,88 @@
         <span class="hero-meta">Rôle <span>DA · Graphisme</span></span>
       </div>
     </div>
-    <div id="scroll-cue"><span>SCROLL</span><span class="bar"></span></div>
+
+    <a id="scroll-cue" href="#infos"><span>SCROLL</span><span class="bar"></span></a>
   </section>
 
+  <!-- INFOS -->
   <section id="infos">
-    <div class="infos-sticky">
-      <div class="infos-disk-wrap" data-parallax="0.12"><img src="assets/Floppy_Disk.png" alt="Pick Your Crew" /></div>
-      <span class="infos-disk-caption">DISK 01 — PICK YOUR CREW — 2026</span>
-    </div>
     <div class="infos-content">
-      <span class="section-kicker reveal">Étude de cas</span>
-      <div class="info-block reveal"><h4>Le projet</h4><p>Pick Your Crew est un battle de danse Afro &amp; Hiphop étudiant organisé au Gymnase de l'UT3 à Toulouse. Pour la 2ème édition, la mission couvrait l'intégralité de la direction artistique : affiche principale, identité visuelle de l'événement, supports de communication numériques et print. L'enjeu était de créer une identité forte, immédiatement lisible, qui parle autant aux danseurs qu'au grand public.</p></div>
-      <div class="info-block reveal"><h4>Direction artistique</h4><p>Le parti pris visuel joue sur la tension entre l'énergie brute de la danse urbaine inspirée du hiphop New-Yorkais des années 70 et une typographie monumentale en rouge et blanc. Le rouge vif sur fond noir et blanc désaturé crée un contraste fort qui attire l'attention. Pensé pour fonctionner en format numérique comme en impression jusqu'à l'A3.</p></div>
-      <div class="info-block reveal"><h4>Livrables</h4><p>Affiche principale format A4 &amp; A3 · Versions numériques réseaux sociaux (stories, posts carrés) · QR code intégré · L'ensemble du système graphique a été pensé pour être déclinable et cohérent sur tous les supports.</p></div>
-      <div class="info-block reveal"><h4>Outils &amp; rôle</h4><p>Photoshop · InDesign · Premiere Pro · After Effects · Direction artistique · Vidéos promotionnelles · Print · 2026</p></div>
+      <div class="info-block reveal">
+        <h4>Le projet</h4>
+        <p>Pick Your Crew est un battle de danse Afro &amp; Hiphop étudiant organisé au Gymnase de l'UT3 à Toulouse. Pour la 2ème édition, la mission couvrait l'intégralité de la direction artistique : affiche principale, identité visuelle de l'événement, supports de communication numériques et print. L'enjeu était de créer une identité forte, immédiatement lisible, qui parle autant aux danseurs qu'au grand public.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Direction artistique</h4>
+        <p>Le parti pris visuel joue sur la tension entre l'énergie brute de la danse urbaine inspirée du hiphop New-Yorkais des années 70 et une typographie monumentale en rouge et blanc. Le rouge vif sur fond noir et blanc désaturé crée un contraste fort qui attire l'attention. Pensé pour fonctionner en format numérique comme en impression jusqu'à l'A3.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Livrables</h4>
+        <p>Affiche principale format A4 &amp; A3 · Versions numériques réseaux sociaux (stories, posts carrés) · QR code intégré · L'ensemble du système graphique a été pensé pour être déclinable et cohérent sur tous les supports.</p>
+      </div>
+      <div class="info-block reveal">
+        <h4>Outils &amp; rôle</h4>
+        <p>Photoshop · InDesign · Premiere Pro · After Effects · Direction artistique · Vidéos promotionnelles · Print · 2026</p>
+      </div>
+    </div>
+
+    <div class="infos-divider"></div>
+
+    <div class="infos-disk-block">
+      <div class="infos-disk-wrap"><img src="assets/Floppy_Disk.png" alt="Pick Your Crew" /></div>
+      <span class="infos-disk-caption">Disk 01 — Pick Your Crew — 2026</span>
     </div>
   </section>
 
+  <!-- MOCKUPS -->
   <section class="gallery-section">
-    <div class="gallery-head reveal-head">
-      <span class="section-kicker">Aperçus</span>
+    <div class="section-head reveal-head">
       <h2 class="section-title">/Mockups</h2>
     </div>
     <div class="gallery-grid feature">
-      <div class="mockup-item reveal" data-src="assets/Bendito_Mockup-TT-Free-Poster.jpg" style="grid-column:1; grid-row:1/3;">
+      <div class="mockup-item reveal" data-src="assets/Bendito_Mockup-TT-Free-Poster.jpg" data-title="Pick Your Crew" style="grid-column:1; grid-row:1/3;">
         <div class="mockup-inner fill"><img src="assets/Bendito_Mockup-TT-Free-Poster.jpg" alt="Mockup Pick Your Crew" /></div>
       </div>
       <div class="mockup-item reveal" style="grid-column:2; grid-row:1;">
-        <div class="mockup-inner fill"><div class="mockup-video" data-youtube="https://www.youtube.com/watch?v=HoSG3sP5yFM"></div></div>
+        <div class="mockup-inner fill">
+          <div class="video-embed" data-youtube="https://www.youtube.com/watch?v=HoSG3sP5yFM">
+            <img class="video-embed-thumb" alt="Aperçu vidéo Pick Your Crew" />
+            <iframe class="video-embed-iframe" allow="autoplay; encrypted-media" title="Aperçu vidéo" frameborder="0"></iframe>
+          </div>
+        </div>
       </div>
       <div class="mockup-item reveal" style="grid-column:2; grid-row:2;">
-        <div class="mockup-inner fill"><div class="mockup-video" data-youtube="https://www.youtube.com/watch?v=JKKdlV1u0xE"></div></div>
+        <div class="mockup-inner fill">
+          <div class="video-embed" data-youtube="https://www.youtube.com/watch?v=JKKdlV1u0xE">
+            <img class="video-embed-thumb" alt="Aperçu vidéo Pick Your Crew" />
+            <iframe class="video-embed-iframe" allow="autoplay; encrypted-media" title="Aperçu vidéo" frameborder="0"></iframe>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- FOOTER / NEXT PROJECT -->
   <section id="proj-footer">
     <span class="next-label reveal">Projet suivant</span>
     <a href="projet_2.html" class="next-link reveal">Dance No One Cares <span class="arrow">→</span></a>
     <p class="footer-sig reveal">© 2026 Olivier Gibert — prism.stdio · Kakumo</p>
   </section>
 
-  <div class="mlightbox" id="mlightbox"><img class="mlightbox-img" id="mlightbox-img" src="" alt="" /></div>
-  <div id="play-cursor"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" /><path d="M32 26 L56 40 L32 54 Z" /></svg></div>
+  <!-- MOCKUP LIGHTBOX (images only — reuses the site's lightbox visual language) -->
+  <div class="lightbox" id="mlightbox" data-testid="mlightbox">
+    <div class="lightbox-inner">
+      <div class="lightbox-frame"><img class="lightbox-img" id="mlightbox-img" src="" alt="" /></div>
+    </div>
+  </div>
+
+  <!-- VIDEO MODAL (mockup videos) -->
+  <div id="hero-play-overlay">
+    <svg viewBox="0 0 80 80" id="hero-play-icon" width="70" height="70">
+      <circle cx="40" cy="40" r="38" /><path d="M32 26 L56 40 L32 54 Z" />
+    </svg>
+  </div>
   <div class="video-modal" id="video-modal"><div class="video-modal-inner" id="video-modal-inner"></div></div>
+
 </body>
 </html>

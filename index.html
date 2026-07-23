@@ -5,342 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portfolio — Olivier Gibert</title>
 
+  <link rel="stylesheet" href="styles.css" />
+
   <!-- Scroll-driven animation engine (deferred → never blocks parsing/DOMContentLoaded) -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script defer src="main.js"></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Mono:wght@400;700&display=swap');
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --red:  #D10000;
-      --white:#f0ede8;
-      --dark: #000000;
-    }
-
-    html, body {
-      width: 100%; height: 100%;
-      background: var(--dark);
-      overflow-x: hidden;
-      cursor: crosshair;
-    }
-    body { -webkit-font-smoothing: antialiased; }
-
-    /* Lenis */
-    html.lenis, html.lenis body { height: auto; }
-    .lenis.lenis-smooth { scroll-behavior: auto !important; }
-    .lenis.lenis-stopped { overflow: hidden; }
-
-    /* ══════════════════════════════
-       IMMERSIVE OVERLAYS (grain · scanline · vignette · progress · cursor)
-    ══════════════════════════════ */
-    #grain {
-      position: fixed; inset: -150%;
-      z-index: 9000; pointer-events: none;
-      opacity: 0.045;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      animation: grainShift 0.5s steps(2) infinite;
-    }
-    @keyframes grainShift {
-      0%{transform:translate(0,0)} 25%{transform:translate(-3%,2%)}
-      50%{transform:translate(2%,-3%)} 75%{transform:translate(-2%,-2%)}
-      100%{transform:translate(2%,3%)}
-    }
-    #scanlines {
-      position: fixed; inset: 0; z-index: 9001; pointer-events: none;
-      background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0) 4px);
-      mix-blend-mode: multiply; opacity: 0.5;
-    }
-    #vignette {
-      position: fixed; inset: 0; z-index: 9002; pointer-events: none;
-      box-shadow: inset 0 0 220px 40px rgba(0,0,0,0.85);
-    }
-
-    /* Scroll progress bar */
-    #progress {
-      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
-      background: var(--red); z-index: 9100;
-      box-shadow: 0 0 12px var(--red);
-    }
-    #scroll-readout {
-      position: fixed; bottom: 22px; right: 24px; z-index: 9100;
-      font-family: "Space Mono", monospace; font-size: 0.62rem;
-      letter-spacing: 0.25em; color: var(--red);
-      text-shadow: 0 0 4px var(--red); pointer-events: none;
-      mix-blend-mode: difference;
-    }
-
-    /* Custom cursor ring (additive to native crosshair) */
-    #cursor-ring {
-      position: fixed; top: 0; left: 0; width: 34px; height: 34px;
-      border: 1px solid var(--red); border-radius: 50%;
-      margin: -17px 0 0 -17px; z-index: 9200; pointer-events: none;
-      mix-blend-mode: difference;
-      transition: width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1),
-                  margin .25s cubic-bezier(.16,1,.3,1), background .25s ease, opacity .3s ease;
-      opacity: 0;
-    }
-    #cursor-ring.hot { width: 64px; height: 64px; margin:-32px 0 0 -32px; background: rgba(209,0,0,0.16); }
-    @media (hover:none){ #cursor-ring{display:none;} }
-
-    /* Side section index */
-    #side-nav {
-      position: fixed; top: 50%; right: 22px; transform: translateY(-50%);
-      z-index: 9100; display: flex; flex-direction: column; gap: 16px;
-      align-items: flex-end; mix-blend-mode: difference;
-    }
-    #side-nav a {
-      display: flex; align-items: center; gap: 10px; text-decoration: none;
-      font-family: "Space Mono", monospace; font-size: 0.58rem; letter-spacing: 0.18em;
-      color: var(--white); opacity: 0.4; transition: opacity .3s ease;
-    }
-    #side-nav a .dot {
-      width: 7px; height: 7px; border: 1px solid var(--white); border-radius: 50%;
-      transition: all .3s ease;
-    }
-    #side-nav a .lbl { opacity: 0; transform: translateX(8px); transition: all .3s ease; }
-    #side-nav a:hover, #side-nav a.active { opacity: 1; }
-    #side-nav a:hover .lbl, #side-nav a.active .lbl { opacity: 1; transform: translateX(0); }
-    #side-nav a.active .dot { background: var(--red); border-color: var(--red); box-shadow: 0 0 8px var(--red); transform: scale(1.3); }
-    @media (max-width:900px){ #side-nav{display:none;} }
-
-    @keyframes introSubIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
-    /* ══════════════════════════════ INTRO ══════════════════════════════ */
-    /* ── INTRO — smooth dissolve ── */
-    #intro-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: all; background:#000;
-      display:flex; align-items:center; justify-content:center; will-change: opacity, transform;
-      transition: opacity .9s cubic-bezier(0.16,1,0.3,1), transform .9s cubic-bezier(0.16,1,0.3,1); }
-    #intro-overlay.open { opacity:0; transform: scale(1.07); pointer-events:none; }
-    #intro-overlay.done { display:none; }
-    #intro-word {
-      font-family:"Space Mono", monospace; color:var(--red); letter-spacing:0.5em; font-size:0.8rem;
-      text-shadow:0 0 6px var(--red); text-transform:uppercase; animation: introSubIn .7s .15s both;
-      transition: opacity .55s ease, letter-spacing .9s cubic-bezier(0.16,1,0.3,1); }
-    #intro-overlay.open #intro-word { opacity:0; letter-spacing:0.95em; }
-
-    /* ═══════════════════════════════ HERO ═══════════════════════════════ */
-    #hero { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
-
-    #hero-name {
-      position: absolute; left: 6vw; bottom: 12vh; z-index: 6;
-      font-family: "Google Sans", sans-serif; font-weight: 700;
-      font-size: clamp(2.4rem, 8vw, 7.5rem); line-height: 0.92;
-      color: var(--white); text-transform: uppercase; letter-spacing: -0.02em;
-      mix-blend-mode: difference; pointer-events: none;
-    }
-    #hero-name .ln { display:block; overflow:hidden; }
-    #hero-name .ch { display:inline-block; }
-
-    #hero-tag {
-      position: absolute; left: 6vw; top: 18vh; z-index: 6;
-      font-family:"Space Mono", monospace; font-size:0.7rem; letter-spacing:0.35em;
-      color: var(--red); text-transform:uppercase; text-shadow:0 0 4px var(--red);
-      mix-blend-mode: difference; max-width: 60vw;
-    }
-
-    #hero-video-wrap { position:absolute; inset:0; width:100%; height:100%; cursor:none; overflow:hidden; }
-    #hero-thumb { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
-      filter: grayscale(100%) contrast(1.08); background:#0a0a0a; }
-    #hero-bg-iframe { position:absolute; top:50%; left:50%; width:130%; height:130%;
-      transform: translate(-50%,-50%); pointer-events:none; filter: grayscale(100%) contrast(1.08);
-      opacity:0; transition: opacity .6s ease; }
-    #hero-bg-iframe.loaded { opacity:1; }
-    #hero::after { content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
-      background: radial-gradient(120% 90% at 70% 30%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 100%); }
-
-    #hero-play-overlay { position:fixed; top:0; left:0; width:70px; height:70px; margin:-35px 0 0 -35px;
-      display:flex; align-items:center; justify-content:center; z-index:50; pointer-events:none;
-      opacity:0; transition: opacity .25s ease; mix-blend-mode: difference; }
-    #hero-play-overlay.visible { opacity:1; }
-    #hero-play-icon { width:70px; height:70px; display:block; }
-    #hero-play-icon circle { fill:#fff; } #hero-play-icon path { fill:#000; }
-
-    #scroll-cue { position:absolute; left:50%; bottom:26px; transform:translateX(-50%); z-index:6;
-      display:flex; flex-direction:column; align-items:center; gap:10px; mix-blend-mode:difference;
-      font-family:"Space Mono", monospace; font-size:0.55rem; letter-spacing:0.4em; color:var(--white); }
-    #scroll-cue .bar { width:1px; height:40px; background:var(--white); transform-origin:top; animation: cueScroll 1.8s cubic-bezier(.7,0,.3,1) infinite; }
-    @keyframes cueScroll { 0%{transform:scaleY(0);transform-origin:top} 45%{transform:scaleY(1);transform-origin:top} 55%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
-
-    /* ── Video modal ── */
-    .video-modal { position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0);
-      display:flex; align-items:center; justify-content:center; pointer-events:none;
-      transition: background .5s cubic-bezier(0.16,1,0.3,1); }
-    .video-modal.active { background:rgba(0,0,0,0.94); pointer-events:all; }
-    .video-modal-inner { width:min(78vw,1100px); aspect-ratio:16/9; opacity:0;
-      transform: scale(0.93) translateY(16px);
-      transition: opacity .55s cubic-bezier(0.16,1,0.3,1), transform .55s cubic-bezier(0.16,1,0.3,1);
-      pointer-events:none; position:relative; }
-    .video-modal.active .video-modal-inner { opacity:1; transform: scale(1) translateY(0); pointer-events:auto; }
-    .video-modal-inner iframe { width:100%; height:100%; border:none; display:block; }
-
-    /* ── NAV ── */
-    nav { position:fixed; top:0; left:0; width:100%; z-index:999;
-      background: rgba(0,0,0,0.35); backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(209,0,0,0.25); }
-    .hero-content { width:100%; display:flex; align-items:center; justify-content:flex-end; gap: clamp(8px,3vw,46px); padding: 0 clamp(16px,4vw,48px); }
-    .nav-btn { display:block; font-family:"Space Mono", monospace; font-weight:700;
-      text-shadow:0 0 2px var(--red); text-decoration:none; color:var(--red); background:transparent;
-      transition: color .38s ease, background .12s ease, letter-spacing .38s cubic-bezier(.25,1,.5,1);
-      font-size:0.72rem; letter-spacing:0.12em; padding:22px 6px; position:relative; }
-    .nav-btn::after { content:''; position:absolute; left:6px; right:6px; bottom:14px; height:1px; background:var(--red); transform:scaleX(0); transform-origin:left; transition: transform .35s cubic-bezier(.16,1,.3,1); }
-    .nav-btn:hover { color:var(--white); letter-spacing:0.22em; }
-    .nav-btn:hover::after { transform:scaleX(1); }
-
-    /* ═══════════════════════════════ A PROPOS ═══════════════════════════════ */
-    #a-propos { width:100vw; background:var(--dark); display:flex; flex-direction:column;
-      align-items:center; padding: 14vh 60px 12vh; position:relative; }
-    .apropos-img-wrap { display:flex; justify-content:center; margin-bottom:40px; will-change: transform; }
-    .apropos-img { width:380px; max-width:80vw; height:auto; display:block; }
-    @keyframes float { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-14px) rotate(-1.5deg)} }
-    .apropos-titles { display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; width:100%; max-width:920px; }
-    .apropos-title-item { position:relative; }
-    .apropos-title-item h3 { font-family:"Space Mono", monospace; font-weight:700; font-size:0.74rem;
-      letter-spacing:0.12em; text-transform:uppercase; color:var(--red); text-shadow:0 0 2px var(--red); padding:14px 22px;
-      cursor:default; white-space:nowrap; display:inline-block; outline:2px solid transparent; transition: outline-color .2s ease, color .2s ease; }
-    .apropos-title-item:hover h3 { outline:2px solid var(--red); color:var(--white); }
-    .apropos-text-zone { width:100%; max-width:660px; margin-top:48px; display:grid; min-height: 8.5em; }
-    .apropos-text-zone p { grid-area:1/1; font-family:"Space Mono", monospace; font-weight:400;
-      font-size:0.74rem; line-height:1.95; letter-spacing:0.01em; color:var(--white); text-align:center; opacity:0; transition: opacity .25s ease; }
-    .apropos-text-zone p.visible { opacity:1; }
-    @media (max-width:700px){ #a-propos{padding:12vh 18px 10vh;} .apropos-titles{flex-direction:column;align-items:center;} .apropos-img{width:200px;} }
-
-    .cv-btn { font-family:"Space Mono", monospace; font-weight:700; font-size:0.74rem; letter-spacing:0.12em; text-transform:uppercase;
-      color:var(--red); text-decoration:none; text-shadow:0 0 2px var(--red); background:transparent;
-      padding:12px 20px; border:2px solid var(--red); line-height:1;
-      transition: color .38s ease, background .38s ease, letter-spacing .38s cubic-bezier(.25,1,.5,1); }
-    .cv-btn:hover { color:var(--white); background:var(--red); letter-spacing:0.18em; }
-
-    /* ═══════════════════════════════ AFFICHES ═══════════════════════════════ */
-    #affiches { width:100vw; min-height:100vh; background:var(--dark); display:flex; flex-direction:column;
-      align-items:center; padding: 0 0 14vh; position:relative; }
-    .section-head { width:100%; max-width:1300px; padding: 14vh 60px 8vh; }
-    .section-kicker { font-family:"Space Mono", monospace; font-size:0.6rem; letter-spacing:0.4em;
-      color:var(--white); opacity:0.5; text-transform:uppercase; margin-bottom:14px; display:block; }
-    .affiches-title, .projets-title, .contacts-title {
-      font-family:"Google Sans", sans-serif; font-weight:700; font-size: clamp(2rem,6vw,5rem);
-      color:var(--red); text-transform:uppercase; text-shadow:0 0 8px rgba(209,0,0,0.4);
-      line-height:0.95; }
-    .affiches-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:36px; width:100%;
-      max-width:1300px; padding:0 60px; }
-    @media (max-width:900px){ .affiches-grid{grid-template-columns:repeat(2,1fr);} }
-    @media (max-width:620px){ .affiches-grid{grid-template-columns:1fr;} .section-head{padding:12vh 20px 6vh;} }
-    .poster-card { position:relative; cursor:pointer; will-change: transform, opacity; }
-    .poster-inner { width:100%; transform-origin:bottom center; transform:rotate(0) translateY(0);
-      transition: transform .6s cubic-bezier(0.22,1,0.36,1), filter .6s ease; filter:brightness(1); }
-    .poster-card:hover .poster-inner { transform:rotate(-4deg) translateY(-12px); filter:brightness(1.08); }
-    .poster-inner img { width:100%; height:auto; display:block; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
-    .poster-meta { font-family:"Space Mono", monospace; font-size:0.6rem; letter-spacing:0.15em;
-      color:var(--white); opacity:0.55; margin-top:14px; text-transform:uppercase; display:flex; justify-content:space-between; }
-    .poster-card:hover .poster-meta { opacity:1; color:var(--red); }
-
-    /* ═══════════════════════════════ LIGHTBOX ═══════════════════════════════ */
-    .lightbox { position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0);
-      display:flex; align-items:center; justify-content:center; pointer-events:none;
-      transition: background .5s cubic-bezier(0.16,1,0.3,1); }
-    .lightbox.active { background:rgba(0,0,0,0.94); pointer-events:all; cursor:crosshair; }
-    .lightbox-inner { display:flex; align-items:flex-start; gap:52px; max-width:90vw; max-height:90vh;
-      opacity:0; transform:scale(0.93) translateY(16px);
-      transition: opacity .55s cubic-bezier(0.16,1,0.3,1), transform .55s cubic-bezier(0.16,1,0.3,1); pointer-events:none; }
-    .lightbox.active .lightbox-inner { opacity:1; transform:scale(1) translateY(0); pointer-events:auto; }
-    .lightbox-img { max-height:85vh; max-width:42vw; width:auto; object-fit:contain; display:block; flex-shrink:0; box-shadow:0 30px 80px rgba(0,0,0,0.6); }
-    @media (max-width:820px){ .lightbox-inner{flex-direction:column;gap:20px;overflow-y:auto;} .lightbox-img{max-width:80vw;max-height:55vh;} }
-    .lightbox-desc { max-width:360px; min-width:260px; display:flex; flex-direction:column; gap:18px; padding-top:4px;
-      opacity:0; transform:translateX(28px);
-      transition: opacity .55s .14s cubic-bezier(0.16,1,0.3,1), transform .55s .14s cubic-bezier(0.16,1,0.3,1); }
-    .lightbox.active .lightbox-desc { opacity:1; transform:translateX(0); }
-    .lightbox-desc.closing { opacity:0; transform:translateX(28px); transition: opacity .3s, transform .3s; }
-    .lb-info-block { display:flex; flex-direction:column; }
-    .lb-info-block h4 { display:inline-block; font-family:"Google Sans", sans-serif; font-weight:700;
-      font-size:0.82rem; text-transform:uppercase; color:var(--white); background:var(--red);
-      padding:8px 14px; align-self:flex-start; text-shadow:0 0 2px var(--white); margin-bottom:14px; }
-    .lb-info-block p { font-family:"Space Mono", monospace; font-weight:400; font-size:0.74rem; line-height:1.8; letter-spacing:0.01em; color:var(--white); }
-
-    /* ═══════════════════════════════ PROJETS ═══════════════════════════════ */
-    #projets { position:relative; width:100vw; min-height:100vh; display:flex; flex-direction:column;
-      align-items:center; justify-content:center; padding: 0 0 14vh; overflow:hidden; }
-    #bg-video-2 { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-      filter: grayscale(100%) contrast(1.05) brightness(0.5); transform: scale(1.08); z-index:0; }
-    #projets::after { content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
-      background: linear-gradient(to bottom, #000 0%, transparent 22%, transparent 78%, #000 100%); }
-    #projets .section-head { position:relative; z-index:2; }
-    .projets-grid { position:relative; z-index:2; display:grid; grid-template-columns: repeat(4, 1fr);
-      gap: 28px; width:100%; max-width:1300px; padding:0 60px; align-items:end; }
-    @media (max-width:900px){ .projets-grid{grid-template-columns:repeat(2,1fr);row-gap:50px;} }
-    .disk-card { position:relative; cursor:pointer; display:flex; flex-direction:column; align-items:center; will-change: transform, opacity; }
-    .disk-label { display:flex; flex-direction:column; align-items:center; gap:4px; margin-bottom:16px;
-      opacity:0.45; transition: opacity .4s ease; text-align:center; }
-    .disk-card:hover .disk-label { opacity:1; }
-    .disk-num { font-family:"Space Mono", monospace; font-weight:700; text-shadow:0 0 2px var(--white);
-      font-size:0.8rem; text-transform:uppercase; color:var(--white); background:var(--red); padding:8px 14px; margin-bottom:6px; }
-    .disk-name { font-family:"Space Mono", monospace; font-weight:700; font-size:0.62rem; letter-spacing:0.08em;
-      color:rgba(240,237,232,0.6); text-transform:uppercase; }
-    .disk-inner { width:100%; transform-origin:center; filter:brightness(0.9) saturate(0.95); will-change:transform,filter;
-      transition: transform .7s cubic-bezier(0.16,1,0.3,1), filter .7s cubic-bezier(0.16,1,0.3,1); }
-    .disk-inner img { width:100%; height:auto; display:block; }
-    .disk-card.floating .disk-inner { animation: diskFloat 6s ease-in-out infinite; }
-    .disk-card:nth-child(2).floating .disk-inner { animation-duration:6.8s; animation-delay:-1s; }
-    .disk-card:nth-child(3).floating .disk-inner { animation-duration:5.4s; animation-delay:-2s; }
-    .disk-card:nth-child(4).floating .disk-inner { animation-duration:7.2s; animation-delay:-0.5s; }
-    @keyframes diskFloat { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-12px) rotate(1deg)} }
-    .disk-card:hover .disk-inner { animation:none; transform:translateY(-30px) scale(1.06) rotate(-1deg); filter:brightness(1.18) saturate(1.1); }
-    .disk-card:hover .disk-inner img { filter: drop-shadow(0 24px 30px rgba(0,0,0,0.6)); }
-
-    /* ═══════════════════════════════ CONTACTS ═══════════════════════════════ */
-    #contacts { width:100vw; background:var(--dark); display:flex; flex-direction:column; align-items:flex-start;
-      padding: 0 60px 16vh; position:relative; }
-    #contacts .section-head { padding-left:0; padding-right:0; }
-    .contacts-row { display:flex; flex-direction:column; align-items:flex-start; gap:8px; width:100%; }
-    .contact-item { display:flex; align-items:center; gap:18px; text-decoration:none; padding:14px 0;
-      border-bottom:1px solid rgba(209,0,0,0.18); width:100%; max-width:760px;
-      transition: padding-left .4s cubic-bezier(.16,1,.3,1); will-change: transform, opacity; }
-    .contact-item:hover { padding-left:18px; }
-    .contact-icon { display:flex; align-items:center; justify-content:center; color:var(--red); flex-shrink:0; }
-    .contact-icon svg { width:22px; height:22px; fill:var(--red); transition: transform .4s ease; }
-    .contact-item:hover .contact-icon svg { transform: rotate(-8deg) scale(1.15); }
-    .contact-text { font-family:"Google Sans", sans-serif; font-weight:700; font-size: clamp(1rem,2.4vw,1.6rem);
-      color:var(--white); transition: color .3s ease; }
-    .contact-item:hover .contact-text { color:var(--red); }
-    .contact-arrow { margin-left:auto; font-family:"Space Mono", monospace; color:var(--red); opacity:0;
-      transform: translateX(-10px); transition: all .35s cubic-bezier(.16,1,.3,1); }
-    .contact-item:hover .contact-arrow { opacity:1; transform: translateX(0); }
-    .footer-sig { font-family:"Space Mono", monospace; font-size:0.6rem; letter-spacing:0.25em;
-      color:rgba(240,237,232,0.4); margin-top:60px; text-transform:uppercase; }
-  </style>
 </head>
 <body>
 
   <!-- IMMERSION LAYERS -->
   <div id="grain"></div>
-  <div id="scanlines"></div>
   <div id="vignette"></div>
   <div id="progress"></div>
-  <div id="scroll-readout" data-testid="scroll-readout">00 / 100</div>
   <div id="cursor-ring"></div>
 
   <!-- INTRO -->
   <div id="intro-overlay" data-testid="intro-overlay">
-    <div id="intro-word">Olivier&nbsp;Gibert</div>
+    <div id="intro-word"></div>
   </div>
 
-  <!-- SIDE NAV -->
-  <div id="side-nav" data-testid="side-nav">
-    <a href="#hero" data-target="hero"><span class="lbl">INTRO</span><span class="dot"></span></a>
-    <a href="#a-propos" data-target="a-propos"><span class="lbl">À PROPOS</span><span class="dot"></span></a>
-    <a href="#affiches" data-target="affiches"><span class="lbl">AFFICHES</span><span class="dot"></span></a>
-    <a href="#projets" data-target="projets"><span class="lbl">PROJETS</span><span class="dot"></span></a>
-    <a href="#contacts" data-target="contacts"><span class="lbl">CONTACTS</span><span class="dot"></span></a>
-  </div>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-content">
+      <a href="index.html" class="nav-brand" data-testid="nav-brand">Olivier Gibert.</a>
+      <div class="nav-links">
+        <a href="creator.html" class="nav-btn" data-page="creator.html" data-testid="nav-creator">CREATOR</a>
+        <a href="galerie.html" class="nav-btn" data-page="galerie.html" data-testid="nav-galerie">GALERIE</a>
+        <a href="projets.html"  class="nav-btn" data-page="projets.html" data-testid="nav-projets">PROJETS</a>
+        <a href="contacts.html" class="nav-btn" data-page="contacts.html" data-testid="nav-contacts">CONTACTS</a>
+      </div>
+      <a class="nav-cv-btn" data-testid="nav-cv" href="https://acrobat.adobe.com/id/urn:aaid:sc:EU:1fd2435f-43a8-4d2a-a552-6d10c052c47f" target="_blank" download>↓ CV</a>
+    </div>
+  </nav>
 
   <!-- HERO -->
   <section id="hero">
-    <div id="hero-video-wrap" data-youtube="https://www.youtube.com/watch?v=uPvpfiAyxFQ" data-testid="hero-showreel">
-      <img id="hero-thumb" alt="Showreel Olivier Gibert" />
-      <iframe id="hero-bg-iframe" allow="autoplay; encrypted-media" title="Showreel background" frameborder="0"></iframe>
-    </div>
+<div id="hero-video-wrap" class="video-embed" data-testid="hero-showreel">
+  <video class="hero-video" autoplay muted loop playsinline preload="auto">
+    <source src="assets/SHOWREEL.mp4" type="video/mp4">
+    Votre navigateur ne supporte pas la vidéo.
+  </video>
+</div>
 
     <div id="hero-play-overlay">
       <svg viewBox="0 0 80 80" id="hero-play-icon" width="70" height="70">
@@ -348,148 +55,14 @@
       </svg>
     </div>
 
-    <p id="hero-tag">Design graphique · Direction artistique · Création immersive — Showreel 2025</p>
-    <h3 id="hero-name" data-testid="hero-name">
-      <span class="ln" data-word="OLIVIER"></span>
-      <span class="ln" data-word="GIBERT"></span>
+    <h3 id="hero-name" class="split-title" data-testid="hero-name">
+      <span class="ln" data-word="Olivier"></span>
+      <span class="ln" data-word="Gibert"></span>
     </h3>
-
-    <div id="scroll-cue"><span>SCROLL</span><span class="bar"></span></div>
-
-    <nav>
-      <div class="hero-content">
-        <a href="#a-propos" class="nav-btn" data-testid="nav-apropos">À PROPOS</a>
-        <a href="#affiches" class="nav-btn" data-testid="nav-affiches">AFFICHES</a>
-        <a href="#projets"  class="nav-btn" data-testid="nav-projets">PROJETS</a>
-        <a href="#contacts" class="nav-btn" data-testid="nav-contacts">CONTACTS</a>
-      </div>
-    </nav>
   </section>
-
-  <!-- A PROPOS -->
-  <section id="a-propos">
-    <div class="apropos-img-wrap" data-parallax="0.18">
-      <img class="apropos-img" src="assets/Plan_de_travail_1.png" alt="Olivier Gibert" />
-    </div>
-    <div class="apropos-titles">
-      <div class="apropos-title-item reveal" data-key="profil"><h3>Profil</h3></div>
-      <div class="apropos-title-item reveal" data-key="formations"><h3>Formations</h3></div>
-      <div class="apropos-title-item reveal" data-key="projets-pro"><h3>Projets Pro</h3></div>
-      <div class="apropos-title-item reveal" data-key="soft-skills"><h3>Soft Skills</h3></div>
-      <div class="apropos-title-item reveal" data-key="hard-skills"><h3>Hard Skills</h3></div>
-      <a class="cv-btn reveal" data-testid="cv-button" href="https://acrobat.adobe.com/id/urn:aaid:sc:EU:996cfbd4-e4a5-4bd9-a07c-9387196b1097" download>↓ Télécharger le CV</a>
-    </div>
-    <div class="apropos-text-zone">
-      <p data-key="profil">Mon nom est Olivier Gibert. Actuellement étudiant en design graphique (Bac+2) avec un parcours initial en cursus informatique, je développe une approche qui allie rigueur analytique et sensibilité artistique. En tant que producteur musical sous le nom de Kakumo et créateur de contenu sous prism.stdio, je conçois et partage des projets visuels et sonores qui traduisent un univers créatif multidisciplinaire. Cette pluralité est une force. Polyvalent et autonome, je suis à la recherche d'une alternance à l'intersection du design, de la technologie et de la création immersive, audiovisuelle et musicale.</p>
-      <p data-key="formations">2023-2025 <br> Licence informatique 1ère année <br>•<br>Faculté des Sciences et Ingénieurie<br>(FSI) Université de Toulouse,<br>Toulouse, 31000<br><br>2025-2026<br>Bachelor Graphic Design 2ème année<br>•<br>LISAA Toulouse - Ecole Arts Appliqués,<br>Design &amp; Multimédia, Campus Enova<br>Labège, 31670</p>
-      <p data-key="projets-pro">Création de contenu Instagram • Réalisation de courts métrages • Marque de vêtement française • Graphiste d'un E-roman de développement personnel • Compositeur indépendant &amp; feats</p>
-      <p data-key="soft-skills">Curieux • Créatif • Passionné • Ponctuel • Rigoureux • Autonome • Travail d'équipe • Adaptabilité logicielle • Esprit critique • Veille technologique • Veille graphique</p>
-      <p data-key="hard-skills">Logiciels de la suite Adobe : [ PremierePro • After Effects • InDesign • Photoshop • Illustrator • Lightroom ] • Ableton • DaVinciResolve • Figma • Blender • ChatGPT et Claude IA • Github • Visual Studio Code</p>
-    </div>
-  </section>
-
-  <!-- AFFICHES -->
-  <section id="affiches">
-    <div class="section-head reveal-head">
-      <span class="section-kicker">01 — Direction artistique</span>
-      <h2 class="affiches-title">/Affiches</h2>
-    </div>
-    <div class="affiches-grid">
-      <div class="poster-card" data-src="assets/Taped-Poster-Mockup_Small.png" data-title="[FUSION]" data-desc="Affiche créée dans le cadre d'un projet personnel sous l'identité prism.stdio. [FUSION] explore la collision entre l'organique et le numérique — une fleur prise en macro, des mains qui tentent de s'unir, une bande technique qui traverse le tout comme un portail entre deux dimensions. Le concept repose sur l'idée que deux natures opposées peuvent coexister dans un même espace visuel sans se détruire. Réalisée entièrement sous Photoshop et Illustrator, cette affiche marque le début de la série LIFE IS A WAY TO 001." data-tags="Photoshop · Direction artistique · 2026">
-        <div class="poster-inner"><img src="assets/Taped-Poster-Mockup_Small.png" alt="Fusion" /></div>
-        <div class="poster-meta"><span>[FUSION]</span><span>2026</span></div>
-      </div>
-      <div class="poster-card" data-src="assets/Taped-Poster-Mockup_Small_2.png" data-title="RESURRECTION" data-desc="Affiche de film réimaginée pour Resurrection, présenté en compétition officielle au Festival de Cannes. Le travail porte sur la représentation du rêve pour coller le plus possible à l'imaginaire du film — Le point central de l'affiche est aussi celui du film, une bougie en forme de personnage — personnification du cinéma qui se consume lentement, année après année. En arrière-plan, les silhouettes des différents personnages du film se devinent dans une esthétique onirique, floue, aux portes de l'imaginaire. La typographie érodée vient renforcer cette idée de quelque chose qui se reconstruit depuis ses propres décombres. Un exercice de direction artistique cinématographique réalisé en hommage au film de Bi Gan." data-tags="Photoshop · Cinéma · 2026">
-        <div class="poster-inner"><img src="assets/Taped-Poster-Mockup_Small_2.png" alt="Resurrection" /></div>
-        <div class="poster-meta"><span>RESURRECTION</span><span>2026</span></div>
-      </div>
-      <div class="poster-card" data-src="assets/Taped-Poster-Mockup_Small_3.png" data-title="BACKROOMS" data-desc="EXPEDITION 0 est une expérience immersive à grande échelle de l'agence toulousaine Immersive Games by Momento Event, plongeant les joueurs dans les Backrooms — cet espace liminal infini popularisé en 2020 par le créateur Kane Pixels, dont la vidéo Found Footage questionnait déjà la frontière entre réalité et imaginaire. Pour cette affiche fictive, le parti pris visuel s'articule autour de l'horreur, du surnaturel et de la cinématographie, en s'inspirant de la direction artistique du film Backrooms et de sa typographie minimaliste. Le regard est immédiatement attiré vers le centre de l'image, où une lueur colorée contraste avec l'ensemble et révèle deux silhouettes — l'une humaine, l'autre monstrueuse. Le cadre Found Footage rappelle l'origine même des Backrooms, tandis que le fond glitché et saturé ancre l'affiche dans un espace visuel liminal hors de la réalité, brisant le 4e mur (avec des rappels du motif représentatif de l'étage 0 des 'Backrooms'). Le titre lui-même devient un élément graphique : texturé, modifié, fondu dans la composition." data-tags="Blender · Photoshop · Affiche événementielle · 2026">
-        <div class="poster-inner"><img src="assets/Taped-Poster-Mockup_Small_3.png" alt="Backrooms" /></div>
-        <div class="poster-meta"><span>BACKROOMS</span><span>2026</span></div>
-      </div>
-      <div class="poster-card" data-src="assets/Taped-Poster-Mockup_Small_4.png" data-title="NOTHING TECH" data-desc="Affiche publicitaire fictive pour Nothing Technology, marque connue pour son esthétique transparente et industrielle. Le casque Headphone 1 est mis en scène dans une composition froide et désaturée, entre bleu pâle et gris acier. Un jeu de duplication et d'opacité vient accentuer l'effet de mouvement et de propagation du son. Le slogan 'Hear nothing.' joue sur le paradoxe de la marque et sur l'idée d'un silence choisi. Cette affiche explore comment le design produit peut devenir de la direction artistique à part entière." data-tags="Photoshop · Publicité · Tech · 2026">
-        <div class="poster-inner"><img src="assets/Taped-Poster-Mockup_Small_4.png" alt="Nothing Tech" /></div>
-        <div class="poster-meta"><span>NOTHING TECH</span><span>2026</span></div>
-      </div>
-      <div class="poster-card" data-src="assets/Taped-Poster-Mockup_Small_5.png" data-title="INTO THE LIGHT" data-desc="Affiche pour l'exposition Into The Light présentée aux Grandes Halles de la Villette à Paris, du 9 avril au 31 août 2025. L'exposition plonge le visiteur dans un environnement de lumières laser et de projections architecturales. La typographie en contour lumineux évoque directement les faisceaux lumineux de l'installation. Une affiche pensée pour fonctionner aussi bien en grand format urbain qu'en format numérique (utilisation d'After Effects pour les jeux de lumière sur le titre)." data-tags="Photoshop · After Effects · Affiche culturelle · Paris · 2026">
-        <div class="poster-inner"><img src="assets/Taped-Poster-Mockup_Small_5.png" alt="Into The Light" /></div>
-        <div class="poster-meta"><span>INTO THE LIGHT</span><span>2026</span></div>
-      </div>
-      <div class="poster-card" data-src="assets/Taped-Poster-Mockup_Small_6.png" data-title="THE BEAUTY OF DREAMS" data-desc="Affiche expérimentale conçue autour du concept de perception fragmentée du rêve. La composition s'appuie sur des superpositions de textures, de trames halftone et de plans de couleur pour créer un espace visuel instable, entre le réel et le subconscient. Le titre, partiellement occulté, renforce cette idée que la beauté du rêve réside dans ce qu'on ne peut jamais saisir complètement. Un projet libre, orienté recherche graphique personnelle." data-tags="Photoshop · Recherche graphique · 2026">
-        <div class="poster-inner"><img src="assets/Taped-Poster-Mockup_Small_6.png" alt="The Beauty Of Dreams" /></div>
-        <div class="poster-meta"><span>BEAUTY OF DREAMS</span><span>2026</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LIGHTBOX -->
-  <div class="lightbox" id="lightbox" data-testid="lightbox">
-    <div class="lightbox-inner" id="lightbox-inner">
-      <img class="lightbox-img" id="lightbox-img" src="" alt="" />
-      <div class="lightbox-desc" id="lightbox-desc">
-        <div class="lb-info-block"><h4 id="lb-title"></h4><p id="lb-body"></p></div>
-        <div class="lb-info-block"><h4>Outils &amp; contexte</h4><p id="lb-tags"></p></div>
-      </div>
-    </div>
-  </div>
 
   <!-- VIDEO MODAL -->
   <div class="video-modal" id="video-modal"><div class="video-modal-inner" id="video-modal-inner"></div></div>
 
-  <!-- PROJETS -->
-  <section id="projets">
-    <video id="bg-video-2" autoplay muted loop playsinline>
-      <source src="assets/PORTFOLIO_PROJETS_SECTION.mp4" type="video/mp4">
-    </video>
-    <div class="section-head reveal-head">
-      <span class="section-kicker">02 — Études de cas</span>
-      <h2 class="projets-title">/Projets</h2>
-    </div>
-    <div class="projets-grid">
-      <div class="disk-card" data-href="projet_1.html" data-testid="project-1">
-        <div class="disk-label"><span class="disk-num">PROJET 1</span><span class="disk-name">PICK YOUR CREW 2</span></div>
-        <div class="disk-inner"><img src="assets/Floppy_Disk.png" alt="Disk 1" /></div>
-      </div>
-      <div class="disk-card" data-href="projet_2.html" data-testid="project-2">
-        <div class="disk-label"><span class="disk-num">PROJET 2</span><span class="disk-name">DANCE NO ONE CARES</span></div>
-        <div class="disk-inner"><img src="assets/Floppy_Disk_2.png" alt="Disk 2" /></div>
-      </div>
-      <div class="disk-card" data-href="projet_3.html" data-testid="project-3">
-        <div class="disk-label"><span class="disk-num">PROJET 3</span><span class="disk-name">SWO — COLLECTION AD ASTRA</span></div>
-        <div class="disk-inner"><img src="assets/Floppy_Disk_3.png" alt="Disk 3" /></div>
-      </div>
-      <div class="disk-card" data-href="projet_4.html" data-testid="project-4">
-        <div class="disk-label"><span class="disk-num">PROJET 4</span><span class="disk-name">KAKUMO — FAITH HOPE LOVE</span></div>
-        <div class="disk-inner"><img src="assets/Floppy_Disk_4.png" alt="Disk 4" /></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACTS -->
-  <section id="contacts">
-    <div class="section-head reveal-head">
-      <span class="section-kicker">03 — Travaillons ensemble</span>
-      <h2 class="contacts-title">/Contacts</h2>
-    </div>
-    <div class="contacts-row">
-      <a class="contact-item reveal-contact" href="https://mail.google.com/mail/?view=cm&to=ogib31@gmail.com" target="_blank" data-testid="contact-email">
-        <span class="contact-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
-        <span class="contact-text">ogib31@gmail.com</span><span class="contact-arrow">↗</span>
-      </a>
-      <a class="contact-item reveal-contact" href="https://www.instagram.com/prism.stdio" target="_blank" data-testid="contact-instagram">
-        <span class="contact-icon"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.333 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.333 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.333-3.608-1.308C2.496 19.483 2.225 18.216 2.163 16.85 2.105 15.584 2.093 15.204 2.093 12s.012-3.584.07-4.85c.062-1.366.333-2.633 1.308-3.608C4.446 2.496 5.713 2.225 7.08 2.163 8.416 2.105 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.333.014 7.053.072 5.197.157 3.355.673 2.014 2.014.673 3.355.157 5.197.072 7.053.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.085 1.856.601 3.698 1.942 5.039 1.341 1.341 3.183 1.857 5.039 1.942C8.333 23.986 8.741 24 12 24s3.668-.014 4.948-.072c1.856-.085 3.698-.601 5.039-1.942 1.341-1.341 1.857-3.183 1.942-5.039C23.986 15.668 24 15.259 24 12s-.014-3.668-.072-4.948c-.085-1.856-.601-3.698-1.942-5.039C20.645.673 18.803.157 16.947.072 15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></span>
-        <span class="contact-text">prism.stdio</span><span class="contact-arrow">↗</span>
-      </a>
-      <a class="contact-item reveal-contact" href="https://linktr.ee/OlivierGibert" target="_blank" data-testid="contact-linktree">
-        <span class="contact-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg></span>
-        <span class="contact-text">linktr.ee/OlivierGibert</span><span class="contact-arrow">↗</span>
-      </a>
-      <a class="contact-item reveal-contact" href="https://www.linkedin.com/in/olivier-gibert-3441b5295/" target="_blank" data-testid="contact-linkedin">
-        <span class="contact-icon"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span>
-        <span class="contact-text">Olivier Gibert</span><span class="contact-arrow">↗</span>
-      </a>
-    </div>
-    <p class="footer-sig">© 2026 Olivier Gibert — prism.stdio · Kakumo</p>
-  </section>
 </body>
 </html>

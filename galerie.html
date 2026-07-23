@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galerie — Olivier Gibert</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script defer src="main.js"></script>
+</head>
+<body>
+
+  <!-- IMMERSION LAYERS -->
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="progress"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- INTRO -->
+  <div id="intro-overlay" data-testid="intro-overlay">
+    <div id="intro-word"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-content">
+      <a href="index.html" class="nav-brand" data-testid="nav-brand">Olivier Gibert.</a>
+      <div class="nav-links">
+        <a href="creator.html" class="nav-btn" data-page="creator.html" data-testid="nav-creator">CREATOR</a>
+        <a href="galerie.html" class="nav-btn" data-page="galerie.html" data-testid="nav-galerie">GALERIE</a>
+        <a href="projets.html"  class="nav-btn" data-page="projets.html" data-testid="nav-projets">PROJETS</a>
+        <a href="contacts.html" class="nav-btn" data-page="contacts.html" data-testid="nav-contacts">CONTACTS</a>
+      </div>
+      <a class="nav-cv-btn" data-testid="nav-cv" href="https://acrobat.adobe.com/id/urn:aaid:sc:EU:1fd2435f-43a8-4d2a-a552-6d10c052c47f" target="_blank" download>↓ CV</a>
+    </div>
+  </nav>
+
+  <!-- GALERIE -->
+  <section id="galerie">
+    <div class="section-head">
+      <h2 class="galerie-title split-title" id="galerie-title" data-testid="galerie-title">
+        <span class="ln" data-word="/Galerie"></span>
+      </h2>
+    </div>
+
+    <!--
+      Grille structurée : chaque tuile garde le ratio d'affiche et affiche le
+      visuel en entier (object-fit: contain, pas de recadrage). Le même fichier
+      sert à la fois pour la vignette de grille et l'image agrandie (data-src),
+      pour éviter tout souci de fichier manquant.
+      data-tools = logiciels utilisés, seule info affichée sous l'affiche agrandie.
+    -->
+    <div class="gallery-grid">
+      <div class="gallery-tile" data-src="assets/EDEN.jpg" data-title="Eden" data-tools="Blender, Photoshop">
+        <img src="assets/EDEN.jpg" alt="Eden" />
+        <div class="gallery-caption"><h4>Eden</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/OLYMPIADES.jpg" data-title="Les Olympiades" data-tools="Blender, Photoshop">
+        <img src="assets/OLYMPIADES.jpg" alt="Les Olympiades" />
+        <div class="gallery-caption"><h4>Les Olympiades</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/KERNEL.jpg" data-title="Kernel" data-tools="Blender">
+        <img src="assets/KERNEL.jpg" alt="Kernel" />
+        <div class="gallery-caption"><h4>Kernel</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/ARCANES.jpg" data-title="Arcanes" data-tools="Blender, Photoshop">
+        <img src="assets/ARCANES.jpg" alt="Arcanes" />
+        <div class="gallery-caption"><h4>Arcanes</h4></div>
+      </div>
+
+      <div class="gallery-tile" data-src="assets/Taped-Poster-Mockup_Small.png" data-title="[FUSION]" data-tools="Photoshop, Illustrator">
+        <img src="assets/Taped-Poster-Mockup_Small.png" alt="Fusion" />
+        <div class="gallery-caption"><h4>[FUSION]</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/Taped-Poster-Mockup_Small_2.png" data-title="Resurrection" data-tools="Photoshop">
+        <img src="assets/Taped-Poster-Mockup_Small_2.png" alt="Resurrection" />
+        <div class="gallery-caption"><h4>Resurrection</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/Taped-Poster-Mockup_Small_3.jpg" data-title="Backrooms" data-tools="Blender, Photoshop">
+        <img src="assets/Taped-Poster-Mockup_Small_3.jpg" alt="Backrooms" />
+        <div class="gallery-caption"><h4>Backrooms</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/Taped-Poster-Mockup_Small_4.jpg" data-title="Nothing Tech" data-tools="Photoshop">
+        <img src="assets/Taped-Poster-Mockup_Small_4.jpg" alt="Nothing Tech" />
+        <div class="gallery-caption"><h4>Nothing Tech</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/Taped-Poster-Mockup_Small_5.png" data-title="Into The Light" data-tools="Photoshop, After Effects">
+        <img src="assets/Taped-Poster-Mockup_Small_5.png" alt="Into The Light" />
+        <div class="gallery-caption"><h4>Into The Light</h4></div>
+      </div>
+      <div class="gallery-tile" data-src="assets/Taped-Poster-Mockup_Small_6.jpg" data-title="Beauty of Dreams" data-tools="Photoshop">
+        <img src="assets/Taped-Poster-Mockup_Small_6.jpg" alt="The Beauty Of Dreams" />
+        <div class="gallery-caption"><h4>Beauty of Dreams</h4></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" data-testid="lightbox">
+    <div class="lightbox-inner" id="lightbox-inner">
+      <div class="lightbox-frame">
+        <img class="lightbox-img" id="lightbox-img" src="" alt="" />
+        <div class="lightbox-error-msg" id="lightbox-error-msg">Fichier introuvable — vérifie le chemin dans assets/</div>
+      </div>
+      <div class="lightbox-desc" id="lightbox-desc">
+        <span id="lb-tools"></span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

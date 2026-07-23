@@ -1,31 +1,86 @@
 /* ════════════════════════════════════════════════════════════
    Portfolio — Olivier Gibert
    Scroll-driven (scrub) animation engine: GSAP + ScrollTrigger + Lenis
+   Shared across every page of the site.
    ════════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ─── Build hero name characters (for stagger) ─── */
-  document.querySelectorAll('#hero-name .ln').forEach(ln => {
-    const word = ln.dataset.word || '';
-    ln.innerHTML = word.split('').map(c => `<span class="ch">${c}</span>`).join('');
-  });
-
   /* ─── INTRO — smooth dissolve into the page ─── */
   const introEl = document.getElementById('intro-overlay');
   let heroStarted = false;
-  function dismissIntro() {
-    if (introEl) introEl.classList.add('done');
-    if (!heroStarted) { heroStarted = true; startHeroIntro(); }
+
+  // Reveal one split-into-letters title: fade the element in, stagger its
+  // characters up. Works for #hero-name on index.html and any other page's
+  // title that carries the .split-title class (e.g. Creator).
+  function revealSplitTitle(el) {
+    if (!el) return;
+    el.classList.add('revealed');
+    if (el.id === 'hero-name') armHeroScrollFadeWhenVisible(el);
+    if (!window.gsap) return;
+    const chars = el.querySelectorAll('.ch');
+    gsap.set(chars, { yPercent: 120 });
+    gsap.to(chars, { yPercent: 0, duration: 1.05, stagger: 0.04, ease: 'expo.out' });
   }
-  // Let the red text breathe, fade the whole overlay out, then remove it.
-  setTimeout(() => {
-    introEl.classList.add('open');   // triggers opacity+scale dissolve (0.9s)
-    startHeroIntro();                // hero animates in behind the fading overlay
-    heroStarted = true;
-    setTimeout(dismissIntro, 1000);  // remove after the dissolve completes
-  }, 950);
+
+  // Only let ScrollTrigger take over #hero-name's opacity once it has actually
+  // become visible (opacity:1) — otherwise it snapshots opacity:0 as an inline
+  // style that permanently beats the CSS .revealed rule.
+  function armHeroScrollFadeWhenVisible(heroNameEl) {
+    function arm() {
+      if (heroNameEl._scrollFadeArmed) return;
+      heroNameEl._scrollFadeArmed = true;
+      if (!window.gsap || !window.ScrollTrigger || !document.getElementById('hero')) return;
+      gsap.to(heroNameEl, {
+        yPercent: -40, opacity: 0, ease: 'none',
+        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 }
+      });
+    }
+    heroNameEl.addEventListener('transitionend', function onEnd(e) {
+      if (e.target === heroNameEl && e.propertyName === 'opacity') {
+        heroNameEl.removeEventListener('transitionend', onEnd);
+        arm();
+      }
+    });
+    setTimeout(arm, 700); // safety net if the CSS transition never fires
+  }
+
+  if (introEl) {
+    // Build characters (for stagger) on every split-title on this page
+    document.querySelectorAll('.split-title .ln').forEach(ln => {
+      const word = ln.dataset.word || '';
+      ln.innerHTML = word.split('').map(c => `<span class="ch">${c}</span>`).join('');
+    });
+
+    function reveal() {
+      if (heroStarted) return;
+      heroStarted = true;
+      // titles only fade/slide in once the black has dissolved
+      document.querySelectorAll('.split-title').forEach(revealSplitTitle);
+      document.body.classList.add('intro-done');
+      introEl.classList.add('done');
+    }
+
+    // Very short black hold, then dissolve quickly — page becomes visible as it fades.
+    requestAnimationFrame(() => {
+      setTimeout(() => introEl.classList.add('open'), 200);
+    });
+
+    // Reveal the title(s) exactly when the dissolve finishes (not before).
+    introEl.addEventListener('transitionend', (e) => {
+      if (e.target === introEl && e.propertyName === 'opacity') reveal();
+    });
+    // Safety net in case the transition event doesn't fire for any reason.
+    setTimeout(reveal, 200 + 550 + 250);
+  } else {
+    // No intro on this page — reveal any split-title immediately if present
+    document.body.classList.add('intro-done');
+    document.querySelectorAll('.split-title').forEach(el => {
+      el.classList.add('revealed');
+      if (el.id === 'hero-name') armHeroScrollFadeWhenVisible(el);
+    });
+  }
 
   /* ─── LENIS smooth scroll + GSAP wiring ─── */
   const hasGSAP = window.gsap && window.ScrollTrigger;
@@ -35,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (window.Lenis && !reduceMotion) {
     lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1, smoothWheel: true });
+    window.lenis = lenis;
     if (hasGSAP) {
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -45,41 +101,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /* ─── HERO entrance (after intro) ─── */
-  function startHeroIntro() {
-    if (!hasGSAP) return;
-    gsap.set('#hero-name .ch', { yPercent: 120 });
-    gsap.timeline({ defaults: { ease: 'expo.out' } })
-      .to('#hero-tag', { opacity: 1, y: 0, duration: 0.9, from: { opacity: 0, y: 14 } }, 0)
-      .from('#hero-name .ch', { yPercent: 120, duration: 1.1, stagger: 0.04 }, 0.05)
-      .to('#hero-name .ch', { yPercent: 0, duration: 1.1, stagger: 0.04 }, 0.05);
-  }
-  // Ensure tag visible even without GSAP
-  if (!hasGSAP) { const t = document.getElementById('hero-tag'); if (t) t.style.opacity = 1; }
-
   /* ════════════════════════════════════════════════
      SCROLL-DRIVEN ANIMATIONS (scrub → tied to scroll
      position; freeze when scroll stops, resume on scroll)
      ════════════════════════════════════════════════ */
   if (hasGSAP && !reduceMotion) {
 
-    /* Hero parallax + fade as you scroll away */
-    gsap.to('#hero-video-wrap', {
-      scale: 1.18, yPercent: 12, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 }
-    });
-    gsap.to('#hero-name', {
-      yPercent: -40, opacity: 0, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 }
-    });
-    gsap.to('#hero-tag', {
-      yPercent: -120, opacity: 0, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: '60% top', scrub: 1 }
-    });
-    gsap.to('#scroll-cue', {
-      opacity: 0, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: '15% top', scrub: true }
-    });
+    /* Hero parallax as you scroll away (index.html only) — the hero-name fade
+       tween is armed separately, only once the intro reveal has finished, so it
+       doesn't snapshot opacity:0 before the name has ever been shown. */
+    if (document.getElementById('hero')) {
+      gsap.to('#hero-video-wrap', {
+        scale: 1.18, yPercent: 12, ease: 'none',
+        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 }
+      });
+    }
 
     /* Generic parallax elements */
     gsap.utils.toArray('[data-parallax]').forEach(el => {
@@ -92,10 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* Section heads: slide + tracking expand, scrubbed */
     gsap.utils.toArray('.reveal-head').forEach(head => {
-      gsap.from(head.querySelector('.section-kicker'), {
-        x: -40, opacity: 0, ease: 'none',
-        scrollTrigger: { trigger: head, start: 'top 90%', end: 'top 45%', scrub: 1 }
-      });
+      const kicker = head.querySelector('.section-kicker');
+      if (kicker) {
+        gsap.from(kicker, {
+          x: -40, opacity: 0, ease: 'none',
+          scrollTrigger: { trigger: head, start: 'top 90%', end: 'top 45%', scrub: 1 }
+        });
+      }
       gsap.fromTo(head.querySelector('h2'),
         { x: -80, opacity: 0, letterSpacing: '0.2em' },
         { x: 0, opacity: 1, letterSpacing: '0em', ease: 'none',
@@ -103,13 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-    /* À propos skill titles: scrubbed stagger */
-    gsap.from('.apropos-titles .reveal', {
-      y: 40, opacity: 0, ease: 'none', stagger: 0.08,
-      scrollTrigger: { trigger: '.apropos-titles', start: 'top 88%', end: 'top 50%', scrub: 1 }
-    });
-
-    /* Posters: each rises/rotates scrubbed across the section (parallax depth varies) */
+    /* Posters (Affiches): each rises/rotates scrubbed across the section */
     gsap.utils.toArray('.poster-card').forEach((card, i) => {
       const dir = i % 2 === 0 ? -1 : 1;
       gsap.fromTo(card,
@@ -117,11 +150,19 @@ document.addEventListener('DOMContentLoaded', () => {
         { y: 0, opacity: 1, rotateZ: 0, ease: 'none',
           scrollTrigger: { trigger: card, start: 'top 95%', end: 'top 55%', scrub: 1 } }
       );
-      // continued slow drift after entering, for living movement
       gsap.fromTo(card, { y: 0 }, {
         y: -30 - (i % 3) * 18, ease: 'none',
         scrollTrigger: { trigger: card, start: 'top 55%', end: 'bottom top', scrub: 1.2 }
       });
+    });
+
+    /* Galerie tiles: fade + scale up as they enter */
+    gsap.utils.toArray('.gallery-tile').forEach((tile) => {
+      gsap.fromTo(tile,
+        { scale: 0.9, opacity: 0 },
+        { scale: 1, opacity: 1, ease: 'none',
+          scrollTrigger: { trigger: tile, start: 'top 95%', end: 'top 60%', scrub: 1 } }
+      );
     });
 
     /* Projets disks: assemble from centre, scrubbed to scroll */
@@ -145,12 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
     // bg video subtle parallax
-    gsap.to('#bg-video-2', {
-      yPercent: 14, ease: 'none',
-      scrollTrigger: { trigger: '#projets', start: 'top bottom', end: 'bottom top', scrub: 1 }
-    });
+    if (document.getElementById('projets')) {
+      gsap.to('#bg-video-2', {
+        yPercent: 14, ease: 'none',
+        scrollTrigger: { trigger: '#projets', start: 'top bottom', end: 'bottom top', scrub: 1 }
+      });
+    }
 
-    /* Contacts: scrubbed vertical reveal (no horizontal shift → always left-aligned) */
+    /* Contacts links: scrubbed vertical reveal */
     gsap.from('.reveal-contact', {
       y: 36, opacity: 0, ease: 'none', stagger: 0.12,
       scrollTrigger: { trigger: '.contacts-row', start: 'top 90%', end: 'top 45%', scrub: 1 }
@@ -158,86 +201,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   } else {
     // No GSAP / reduced motion → make sure everything is visible
-    document.querySelectorAll('.reveal, .reveal-contact, .poster-card, .disk-card, .reveal-head h2, .section-kicker')
+    document.querySelectorAll('.reveal, .reveal-contact, .poster-card, .gallery-tile, .disk-card, .reel-tile, .reveal-head h2')
       .forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
     document.querySelectorAll('.disk-card').forEach(c => c.classList.add('floating'));
   }
 
-  /* ─── Scroll progress bar + readout + side-nav active state ─── */
+  /* ─── Scroll progress bar + readout ─── */
   const progress = document.getElementById('progress');
   const readout = document.getElementById('scroll-readout');
-  const sideLinks = document.querySelectorAll('#side-nav a');
-  const sections = [...sideLinks].map(a => document.getElementById(a.dataset.target));
 
   function updateProgress() {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
-    progress.style.width = (p * 100) + '%';
+    if (progress) progress.style.width = (p * 100) + '%';
     if (readout) readout.textContent = String(Math.round(p * 100)).padStart(2, '0') + ' / 100';
-
-    // active section
-    let activeIdx = 0;
-    const mid = window.scrollY + window.innerHeight * 0.4;
-    sections.forEach((sec, i) => { if (sec && sec.offsetTop <= mid) activeIdx = i; });
-    sideLinks.forEach((a, i) => a.classList.toggle('active', i === activeIdx));
   }
+  updateProgress();
   window.addEventListener('scroll', updateProgress, { passive: true });
   window.addEventListener('resize', updateProgress);
-  updateProgress();
+  if (hasGSAP) ScrollTrigger.addEventListener('refresh', updateProgress);
 
-  /* ─── Smooth anchor scrolling (Lenis-aware) ─── */
-  document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', e => {
-      const target = document.querySelector(link.getAttribute('href'));
-      if (!target) return;
-      e.preventDefault();
-      if (lenis) lenis.scrollTo(target, { offset: 0, duration: 1.3 });
-      else target.scrollIntoView({ behavior: 'smooth' });
+  /* ─── Nav + side-nav: highlight the current page ─── */
+  (function markActivePage() {
+    let page = location.pathname.split('/').pop();
+    if (!page) page = 'index.html';
+    document.querySelectorAll('[data-page]').forEach(a => {
+      if (a.dataset.page === page) a.classList.add('active');
     });
-  });
+  })();
 
   /* ─── Custom cursor ring ─── */
   const ring = document.getElementById('cursor-ring');
-  let rx = window.innerWidth / 2, ry = window.innerHeight / 2, cx = rx, cy = ry;
-  window.addEventListener('mousemove', e => { rx = e.clientX; ry = e.clientY; ring.style.opacity = 1; });
-  (function ringLoop() {
-    cx += (rx - cx) * 0.18; cy += (ry - cy) * 0.18;
-    ring.style.transform = `translate(${cx}px, ${cy}px)`;
-    requestAnimationFrame(ringLoop);
-  })();
-  const hotSel = 'a, .poster-card, .disk-card, .apropos-title-item, button, #hero-video-wrap';
-  document.querySelectorAll(hotSel).forEach(el => {
-    el.addEventListener('mouseenter', () => ring.classList.add('hot'));
-    el.addEventListener('mouseleave', () => ring.classList.remove('hot'));
-  });
-
-  /* ─── À propos: hover titles → show matching text ─── */
-  const aproposTitles = document.querySelectorAll('.apropos-title-item');
-  const aproposTexts = document.querySelectorAll('.apropos-text-zone p');
-  let firstShown = false;
-  aproposTitles.forEach(item => {
-    item.addEventListener('mouseenter', () => {
-      const key = item.dataset.key;
-      aproposTexts.forEach(p => p.classList.toggle('visible', p.dataset.key === key));
+  if (ring) {
+    let rx = window.innerWidth / 2, ry = window.innerHeight / 2, cx = rx, cy = ry;
+    window.addEventListener('mousemove', e => { rx = e.clientX; ry = e.clientY; ring.style.opacity = 1; });
+    (function ringLoop() {
+      cx += (rx - cx) * 0.18; cy += (ry - cy) * 0.18;
+      ring.style.transform = `translate(${cx}px, ${cy}px)`;
+      requestAnimationFrame(ringLoop);
+    })();
+    const hotSel = 'a, .poster-card, .disk-card, .gallery-tile, .reel-tile, .video-embed, button';
+    document.querySelectorAll(hotSel).forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hot'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hot'));
     });
-    item.addEventListener('mouseleave', () => aproposTexts.forEach(p => p.classList.remove('visible')));
-  });
-  // Show "profil" by default once section enters view
-  const aproposSection = document.getElementById('a-propos');
-  if (aproposSection) {
-    new IntersectionObserver((entries, obs) => {
-      entries.forEach(en => {
-        if (en.isIntersecting && !firstShown) {
-          firstShown = true;
-          aproposTexts.forEach(p => p.classList.toggle('visible', p.dataset.key === 'profil'));
-        }
-      });
-    }, { threshold: 0.4 }).observe(aproposSection);
-  }
-  // floating idle for apropos image
-  const aproposImg = document.querySelector('.apropos-img');
-  if (aproposImg && !reduceMotion) {
-    setTimeout(() => { aproposImg.style.animation = 'float 6s ease-in-out infinite'; }, 1400);
   }
 
   /* ─── Projets disk navigation — smooth, cinematic "insert" transition ─── */
@@ -266,9 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (window.gsap) {
       gsap.timeline({ onComplete: () => { window.location.href = href; } })
-        // 1) lift & bring forward with a subtle, physical tilt
         .to(clone, { x: cx, y: cy - 18, scale: 1.16, rotationY: 9, rotationZ: -2.5, transformPerspective: 1100, duration: 0.7, ease: 'power2.out' })
-        // 2) smooth slide down into the slot, easing away
         .to(clone, { y: cy + window.innerHeight * 0.9, scale: 0.94, rotationY: 0, rotationZ: 0, opacity: 0, duration: 0.85, ease: 'power3.in' }, '+=0.06');
     } else {
       setTimeout(() => { window.location.href = href; }, 950);
@@ -278,13 +283,13 @@ document.addEventListener('DOMContentLoaded', () => {
     card.addEventListener('click', () => insertDiskAndGo(card));
   });
 
-  /* ─── Hero showreel: thumbnail + bg iframe + custom play cursor ─── */
-  (function heroVideo() {
-    const wrap = document.getElementById('hero-video-wrap');
+  /* ─── Video embeds: showreel thumbnail + bg iframe + click-to-play modal ─── */
+  (function videoEmbeds() {
+    const wraps = document.querySelectorAll('.video-embed[data-youtube]');
+    if (!wraps.length) return;
     const overlay = document.getElementById('hero-play-overlay');
-    const thumb = document.getElementById('hero-thumb');
-    const bgIframe = document.getElementById('hero-bg-iframe');
-    if (!wrap) return;
+    const modal = document.getElementById('video-modal');
+    const inner = document.getElementById('video-modal-inner');
 
     const ytId = (url) => {
       try {
@@ -293,60 +298,211 @@ document.addEventListener('DOMContentLoaded', () => {
         return u.searchParams.get('v') || u.pathname.split('/').pop();
       } catch (e) { return ''; }
     };
-    const id = ytId(wrap.dataset.youtube);
 
-    if (thumb && id) {
-      thumb.src = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
-      thumb.addEventListener('error', () => { thumb.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`; }, { once: true });
+    function openModal(id) {
+      if (!modal || !inner || !id) return;
+      inner.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" title="Vidéo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      modal.classList.add('active');
+      if (lenis) lenis.stop(); document.body.style.overflow = 'hidden';
     }
-    if (bgIframe && id) {
-      const params = new URLSearchParams({ autoplay: '1', mute: '1', loop: '1', playlist: id,
-        controls: '0', modestbranding: '1', rel: '0', showinfo: '0', playsinline: '1', disablekb: '1',
-        iv_load_policy: '3', origin: location.origin });
-      bgIframe.src = `https://www.youtube.com/embed/${id}?${params.toString()}`;
-      bgIframe.addEventListener('load', () => bgIframe.classList.add('loaded'), { once: true });
-    }
-
-    if (overlay) {
-      wrap.addEventListener('mousemove', e => { overlay.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; });
-      wrap.addEventListener('mouseenter', e => { overlay.classList.add('visible'); overlay.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; });
-      wrap.addEventListener('mouseleave', () => overlay.classList.remove('visible'));
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove('active');
+      if (lenis) lenis.start(); document.body.style.overflow = '';
+      setTimeout(() => { if (inner) inner.innerHTML = ''; }, 550);
     }
 
-    // Click → modal player
+    wraps.forEach(wrap => {
+      const thumb = wrap.querySelector('.video-embed-thumb');
+      const bgIframe = wrap.querySelector('.video-embed-iframe');
+      const id = ytId(wrap.dataset.youtube);
+
+      if (thumb && id) {
+        thumb.src = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+        thumb.addEventListener('error', () => { thumb.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`; }, { once: true });
+      }
+      if (bgIframe && id) {
+        const params = new URLSearchParams({ autoplay: '1', mute: '1', loop: '1', playlist: id,
+          controls: '0', modestbranding: '1', rel: '0', showinfo: '0', playsinline: '1', disablekb: '1',
+          iv_load_policy: '3', origin: location.origin });
+        bgIframe.src = `https://www.youtube.com/embed/${id}?${params.toString()}`;
+        bgIframe.addEventListener('load', () => bgIframe.classList.add('loaded'), { once: true });
+      }
+      if (overlay) {
+        wrap.addEventListener('mousemove', e => { overlay.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; });
+        wrap.addEventListener('mouseenter', e => { overlay.classList.add('visible'); overlay.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; });
+        wrap.addEventListener('mouseleave', () => overlay.classList.remove('visible'));
+      }
+      wrap.addEventListener('click', () => openModal(id));
+    });
+
+    if (modal) {
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('active')) closeModal(); });
+    }
+  })();
+
+  /* ─── Reel popups (Creator page) ───
+     Click a .reel-tile: if it has data-video, play the real file cleanly.
+     If data-reel points to YouTube, fetch its real thumbnail automatically
+     and embed it with YouTube's own clean player (no extra chrome). If
+     data-reel points to Instagram, open their embed instead (keeps their
+     own UI — unavoidable without a hosted video file). Tiles with neither
+     stay inert placeholders. */
+  (function reelPopups() {
+    const tiles = document.querySelectorAll('.reel-tile[data-video], .reel-tile[data-reel]');
+    if (!tiles.length) return;
     const modal = document.getElementById('video-modal');
     const inner = document.getElementById('video-modal-inner');
-    const embed = id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : null;
-    function open() {
-      if (!embed) return;
-      inner.innerHTML = `<iframe src="${embed}" title="Showreel" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+    if (!modal || !inner) return;
+
+    function isYouTube(url) { return /youtu\.?be/i.test(url || ''); }
+    function ytId(url) {
+      try {
+        const u = new URL(url);
+        if (u.hostname.includes('youtu.be')) return u.pathname.slice(1).split('/')[0];
+        if (u.pathname.includes('/shorts/')) return u.pathname.split('/shorts/')[1].split('/')[0];
+        return u.searchParams.get('v') || u.pathname.split('/').filter(Boolean).pop();
+      } catch (e) { return ''; }
+    }
+
+    // Auto-fill a real cover thumbnail for any tile whose reel is a YouTube link
+    tiles.forEach(tile => {
+      const reel = tile.dataset.reel;
+      if (!reel || !isYouTube(reel) || tile.querySelector('.reel-cover')) return;
+      const id = ytId(reel);
+      if (!id) return;
+      tile.classList.remove('placeholder');
+      tile.innerHTML = `
+        <img class="reel-cover" src="https://img.youtube.com/vi/${id}/maxresdefault.jpg" alt="" />
+        <div class="reel-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`;
+      const cover = tile.querySelector('.reel-cover');
+      cover.addEventListener('error', () => { cover.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`; }, { once: true });
+    });
+
+    function openWithVideo(src) {
+      inner.classList.add('portrait');
+      inner.innerHTML = `
+        <button class="video-modal-close" aria-label="Fermer">✕</button>
+        <div class="video-modal-media"><video src="${src}" controls autoplay playsinline></video></div>`;
+      modal.classList.add('active');
+      if (lenis) lenis.stop(); document.body.style.overflow = 'hidden';
+    }
+    function openWithReel(url) {
+      inner.classList.add('portrait');
+      let mediaHTML;
+      if (isYouTube(url)) {
+        const id = ytId(url);
+        mediaHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="Reel"></iframe>`;
+      } else {
+        const clean = url.split('?')[0].replace(/\/$/, '');
+        mediaHTML = `<iframe src="${clean}/embed/captioned/" loading="lazy" allowtransparency="true" frameborder="0" scrolling="no" title="Reel Instagram"></iframe>`;
+      }
+      inner.innerHTML = `
+        <button class="video-modal-close" aria-label="Fermer">✕</button>
+        <div class="video-modal-media">${mediaHTML}</div>`;
       modal.classList.add('active');
       if (lenis) lenis.stop(); document.body.style.overflow = 'hidden';
     }
     function close() {
       modal.classList.remove('active');
       if (lenis) lenis.start(); document.body.style.overflow = '';
-      setTimeout(() => { inner.innerHTML = ''; }, 550);
+      setTimeout(() => { inner.innerHTML = ''; inner.classList.remove('portrait'); }, 550);
     }
-    wrap.addEventListener('click', open);
-    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+    tiles.forEach(tile => {
+      tile.addEventListener('click', () => {
+        const video = tile.dataset.video;
+        const reel = tile.dataset.reel;
+        if (video) openWithVideo(video);
+        else if (reel) openWithReel(reel);
+      });
+    });
+    modal.addEventListener('click', e => {
+      if (e.target === modal || e.target.classList.contains('video-modal-close')) close();
+    });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('active')) close(); });
   })();
 
-  /* ─── Lightbox (affiches) ─── */
+  /* ─── Reel stack (Creator page) — story/Tinder-style card deck ─── */
+  (function reelStack() {
+    const stack = document.getElementById('reel-stack');
+    if (!stack) return;
+    const tiles = Array.from(stack.querySelectorAll('.reel-tile'));
+    if (!tiles.length) return;
+    let order = tiles.slice();
+    const dotsWrap = document.getElementById('reel-dots');
+
+    if (dotsWrap) {
+      tiles.forEach((_, i) => {
+        const d = document.createElement('span');
+        d.className = 'dot';
+        dotsWrap.appendChild(d);
+      });
+    }
+    const dots = dotsWrap ? Array.from(dotsWrap.children) : [];
+
+    function layout() {
+      order.forEach((tile, p) => {
+        if (p === 0) {
+          tile.style.transform = 'translate(-50%,0) scale(1) rotate(0deg)';
+          tile.style.zIndex = 50;
+          tile.style.opacity = 1;
+          tile.style.pointerEvents = 'auto';
+        } else if (p <= 3) {
+          const dir = p % 2 === 0 ? 1 : -1;
+          const y = p * 14;
+          const scale = (1 - p * 0.055).toFixed(3);
+          const rot = (dir * p * 3.2).toFixed(1);
+          const xOff = dir * p * 4;
+          tile.style.transform = `translate(calc(-50% + ${xOff}px), ${y}px) scale(${scale}) rotate(${rot}deg)`;
+          tile.style.zIndex = 50 - p;
+          tile.style.opacity = (1 - p * 0.22).toFixed(2);
+          tile.style.pointerEvents = 'none';
+        } else {
+          tile.style.transform = 'translate(-50%, 54px) scale(0.78) rotate(0deg)';
+          tile.style.zIndex = 0;
+          tile.style.opacity = 0;
+          tile.style.pointerEvents = 'none';
+        }
+      });
+      if (dots.length) {
+        const frontIndex = tiles.indexOf(order[0]);
+        dots.forEach((d, i) => d.classList.toggle('active', i === frontIndex));
+      }
+    }
+    function next() { order.push(order.shift()); layout(); }
+    function prev() { order.unshift(order.pop()); layout(); }
+
+    const prevBtn = document.getElementById('reel-prev');
+    const nextBtn = document.getElementById('reel-next');
+    if (prevBtn) prevBtn.addEventListener('click', prev);
+    if (nextBtn) nextBtn.addEventListener('click', next);
+    dots.forEach((d, i) => d.addEventListener('click', () => {
+      while (tiles.indexOf(order[0]) !== i) next();
+    }));
+
+    layout();
+  })();
+
+  /* ─── Lightbox (Affiches / Galerie) ─── */
   (function lightbox() {
     const box = document.getElementById('lightbox');
+    if (!box) return;
     const img = document.getElementById('lightbox-img');
-    const title = document.getElementById('lb-title');
-    const body = document.getElementById('lb-body');
-    const tags = document.getElementById('lb-tags');
+    const tools = document.getElementById('lb-tools');
     const desc = document.getElementById('lightbox-desc');
 
+    const errMsg = document.getElementById('lightbox-error-msg');
+    let clearTimer = null;
     function open(card) {
+      if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+      img.classList.remove('load-error');
+      if (errMsg) errMsg.classList.remove('visible');
+      img.onerror = () => { img.classList.add('load-error'); if (errMsg) errMsg.classList.add('visible'); };
       img.src = card.dataset.src;
-      title.textContent = card.dataset.title;
-      body.textContent = card.dataset.desc;
-      tags.textContent = card.dataset.tags;
+      img.alt = card.dataset.title || '';
+      if (tools) tools.textContent = card.dataset.tools || '';
       desc.classList.remove('closing');
       box.classList.add('active');
       if (lenis) lenis.stop(); document.body.style.overflow = 'hidden';
@@ -355,14 +511,12 @@ document.addEventListener('DOMContentLoaded', () => {
       desc.classList.add('closing');
       box.classList.remove('active');
       if (lenis) lenis.start(); document.body.style.overflow = '';
-      setTimeout(() => { img.src = ''; desc.classList.remove('closing'); }, 550);
+      clearTimer = setTimeout(() => { img.src = ''; desc.classList.remove('closing'); clearTimer = null; }, 550);
     }
-    document.querySelectorAll('.poster-card').forEach(card => card.addEventListener('click', () => open(card)));
+    document.querySelectorAll('.poster-card, .gallery-tile').forEach(card => card.addEventListener('click', () => open(card)));
     box.addEventListener('click', e => { if (e.target === box) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && box.classList.contains('active')) close(); });
   })();
-
-  /* ─── Update intro timing handled above ─── */
 
   if (hasGSAP) setTimeout(() => ScrollTrigger.refresh(), 1200);
 });

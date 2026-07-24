@@ -88,7 +88,10 @@ body.intro-done .hero-tag, body.intro-done .hero-subtitle, body.intro-done .hero
 .gallery-section { width:100vw; background:var(--dark); padding:0 0 16vh; display:flex; flex-direction:column; align-items:center; }
 .gallery-section.alt { background:#050505; }
 .gallery-grid { width:100%; max-width:1400px; padding:0 clamp(20px,6vw,60px); }
-.gallery-grid.feature { display:grid; grid-template-columns:1.3fr 1fr; grid-auto-rows:minmax(220px,1fr); gap:28px; height:70vh; min-height:520px; }
+.gallery-grid.feature { display:grid; grid-template-columns:1.3fr 1fr; grid-template-rows:repeat(2, 1fr); gap:28px; height:70vh; min-height:520px; }
+.gallery-grid.feature .mockup-item { min-height:0; min-width:0; }
+.gallery-grid.feature .mockup-inner.fill,
+.gallery-grid.feature .mockup-inner.fill .video-embed { min-height:0; min-width:0; }
 
 /* Plain grids (no asymmetric spans) — simple pairs, or a 4-column photo series */
 .gallery-grid:not(.feature) { display:grid; grid-template-columns:repeat(2, 1fr); gap:24px; }
@@ -100,8 +103,11 @@ body.intro-done .hero-tag, body.intro-done .hero-subtitle, body.intro-done .hero
   transition: transform .5s cubic-bezier(.16,1,.3,1), border-color .4s ease, box-shadow .4s ease; }
 .mockup-item:hover { transform:translateY(-6px); border-color:var(--red); box-shadow:0 30px 60px rgba(209,0,0,0.25); }
 
-/* Default aspect + fit for plain-grid items (no .fill wrapper / no explicit grid span sizing) */
-.mockup-item:not([style*="grid-row"]) { aspect-ratio:4/5; }
+/* Default aspect + fit for plain-grid items only (feature-grid items use
+   explicit grid placement + stretch instead — never inspect the item's own
+   inline style here, GSAP rewrites it during the reveal animation, which
+   would silently break an attribute-selector-based check). */
+.gallery-grid:not(.feature) .mockup-item { aspect-ratio:4/5; }
 .mockup-inner.fill { width:100%; height:100%; }
 .mockup-inner:not(.fill) { width:100%; height:100%; }
 .mockup-inner img { width:100%; height:100%; object-fit:cover; display:block;
@@ -110,8 +116,8 @@ body.intro-done .hero-tag, body.intro-done .hero-subtitle, body.intro-done .hero
 .mockup-inner.fill .video-embed { width:100%; height:100%; border-radius:0; }
 
 @media (max-width:900px){
-  .gallery-grid.feature { grid-template-columns:1fr; grid-auto-rows:56vw; height:auto; }
-  .gallery-grid.feature [style*="grid-row"] { grid-row:auto !important; grid-column:1 !important; }
+  .gallery-grid.feature { grid-template-columns:1fr; grid-template-rows:none; grid-auto-rows:56vw; height:auto; }
+  .gallery-grid.feature .mockup-item { grid-row:auto !important; grid-column:1 !important; }
   .gallery-grid.cols-4, .gallery-grid.cols-3 { grid-template-columns:repeat(2, 1fr); }
 }
 @media (max-width:560px){
